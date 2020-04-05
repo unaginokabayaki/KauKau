@@ -205,27 +205,23 @@ const SettingScreen = () => {
   );
 };
 
-const RootkNavigator = (props) => {
+const RootkNavigator = () => {
   const context = StateContainer.useContainer();
-  const ref = React.useRef();
-
-  toggleDrawer = () => {
-    ref.current?.dispatch(DrawerActions.toggleDrawer());
-  };
 
   return (
-    <NavigationContainer ref={ref}>
+    <>
       {context.isLogin ? (
         <RootStack.Navigator option={{ headerShown: false }} screenOptions={{}}>
           <RootStack.Screen
             name="Drawer"
             component={SideDrawerNavigator}
-            options={{
+            options={({ navigation }) => ({
               headerShown: true,
               headerLeft: () => (
                 <TouchableOpacity
                   onPress={() => {
-                    toggleDrawer();
+                    navigation.dispatch(DrawerActions.toggleDrawer());
+                    // toggleDrawer();
                   }}
                 >
                   <Ionicons
@@ -236,7 +232,7 @@ const RootkNavigator = (props) => {
                 </TouchableOpacity>
               ),
               animationEnabled: false,
-            }}
+            })}
           />
         </RootStack.Navigator>
       ) : (
@@ -252,14 +248,16 @@ const RootkNavigator = (props) => {
           />
         </RootStack.Navigator>
       )}
-    </NavigationContainer>
+    </>
   );
 };
 
 export default () => {
   return (
     <StateContainer.Provider>
-      <RootkNavigator />
+      <NavigationContainer>
+        <RootkNavigator />
+      </NavigationContainer>
     </StateContainer.Provider>
   );
 };
