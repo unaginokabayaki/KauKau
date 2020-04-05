@@ -1,12 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import AppNavigator from './src/AppNavigator';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>KauKau!</Text>
-    </View>
-  );
+  return <AppNavigator />;
 }
 
 const styles = StyleSheet.create({
