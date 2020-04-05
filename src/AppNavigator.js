@@ -17,7 +17,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { StateContainer, useStore } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
-function LoginScreen({ navigation }) {
+const LoginScreen = ({ navigation }) => {
   let context = StateContainer.useContainer();
   return (
     <View style={styles.container}>
@@ -29,16 +29,16 @@ function LoginScreen({ navigation }) {
       ></Button>
     </View>
   );
-}
+};
 
-function CreateAccountScreen() {
+const CreateAccountScreen = () => {
   let context = StateContainer.useContainer();
   return (
     <View style={styles.container}>
       <Text>CreateAccountScreen</Text>
     </View>
   );
-}
+};
 
 const RootStack = createStackNavigator();
 const SideDrawer = createDrawerNavigator();
@@ -46,7 +46,7 @@ const MainTab = createBottomTabNavigator();
 
 const HomeStack = createStackNavigator();
 
-function MainTabNavigator({ navigation }) {
+const MainTabNavigator = ({ navigation }) => {
   return (
     <MainTab.Navigator tabBarOptions={{ showLabel: true }}>
       <MainTab.Screen
@@ -78,18 +78,18 @@ function MainTabNavigator({ navigation }) {
       />
     </MainTab.Navigator>
   );
-}
+};
 
-function HomeStackNavigator() {
+const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Item" component={ItemScreen} />
     </HomeStack.Navigator>
   );
-}
+};
 
-function HomeScreen({ navigation }) {
+const HomeScreen = ({ navigation }) => {
   let context = StateContainer.useContainer();
 
   return (
@@ -103,41 +103,41 @@ function HomeScreen({ navigation }) {
       <Button title="Help" onPress={() => navigation.navigate('Help')}></Button>
     </View>
   );
-}
+};
 
-function ItemScreen({ navigation }) {
+const ItemScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text>ItemScreen</Text>
     </View>
   );
-}
+};
 
-function RegisterScreen() {
+const RegisterScreen = () => {
   return (
     <View style={styles.container}>
       <Text>RegisterScreen</Text>
     </View>
   );
-}
+};
 
-function NotificationScreen() {
+const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       <Text>NotificationScreen</Text>
     </View>
   );
-}
+};
 
-function AccountScreen({ navigation }) {
+const AccountScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text>AccountScreen</Text>
     </View>
   );
-}
+};
 
-function SideDrawerNavigator() {
+const SideDrawerNavigator = () => {
   const context = StateContainer.useContainer();
   return (
     <SideDrawer.Navigator
@@ -157,9 +157,9 @@ function SideDrawerNavigator() {
       <SideDrawer.Screen name="Setting" component={SettingScreen} />
     </SideDrawer.Navigator>
   );
-}
+};
 
-function CustomDrawerContent(props) {
+const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
@@ -179,33 +179,33 @@ function CustomDrawerContent(props) {
       />
     </DrawerContentScrollView>
   );
-}
+};
 
-function AboutScreen({ navigation }) {
+const AboutScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text>AboutScreen</Text>
     </View>
   );
-}
+};
 
-function HelpScreen() {
+const HelpScreen = () => {
   return (
     <View style={styles.container}>
       <Text>HelpScreen</Text>
     </View>
   );
-}
+};
 
-function SettingScreen() {
+const SettingScreen = () => {
   return (
     <View style={styles.container}>
       <Text>SettingScreen</Text>
     </View>
   );
-}
+};
 
-function RootkNavigator(props) {
+const RootkNavigator = (props) => {
   const context = StateContainer.useContainer();
   const ref = React.useRef();
 
@@ -254,15 +254,15 @@ function RootkNavigator(props) {
       )}
     </NavigationContainer>
   );
-}
+};
 
-export default function AppNavigator() {
+export default () => {
   return (
     <StateContainer.Provider>
       <RootkNavigator />
     </StateContainer.Provider>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
