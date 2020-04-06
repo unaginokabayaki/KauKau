@@ -1,16 +1,16 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import AppNavigator from './src/AppNavigator';
+import { NavigationContainer } from '@react-navigation/native';
+
+import { StateContainer } from 'app/src/AppContext';
+
+import RootNavigator from 'app/src/screens/RootStackNavigator';
 
 export default function App() {
-  return <AppNavigator />;
+  return (
+    <StateContainer.Provider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </StateContainer.Provider>
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
