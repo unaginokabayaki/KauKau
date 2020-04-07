@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import MainStackNavigator from 'app/src/screens/MainStackNavigator';
+import AboutStackNavigator from 'app/src/screens/SideDrawerNavigator/AboutStackNavigator';
 
 import styles from './styles';
 
@@ -30,11 +31,36 @@ const SideDrawerNavigator = () => {
       <SideDrawer.Screen
         name="Main"
         component={MainStackNavigator}
-        options={{ drawerLabel: 'Main' }}
+        options={{
+          drawerLabel: 'Main',
+          drawerIcon: (props) => <Ionicons name="md-home" {...props} />,
+        }}
       />
-      <SideDrawer.Screen name="About" component={AboutStackNavigator} />
-      <SideDrawer.Screen name="Help" component={HelpStackNavigator} />
-      <SideDrawer.Screen name="Setting" component={SettingStackNavigator} />
+      <SideDrawer.Screen
+        name="About"
+        component={AboutStackNavigator}
+        options={{
+          drawerIcon: (props) => (
+            <Ionicons name="md-information-circle-outline" {...props} />
+          ),
+        }}
+      />
+      <SideDrawer.Screen
+        name="Help"
+        component={HelpStackNavigator}
+        options={{
+          drawerIcon: (props) => (
+            <Ionicons name="md-help-circle-outline" {...props} />
+          ),
+        }}
+      />
+      <SideDrawer.Screen
+        name="Setting"
+        component={SettingStackNavigator}
+        options={{
+          drawerIcon: (props) => <Ionicons name="md-settings" {...props} />,
+        }}
+      />
     </SideDrawer.Navigator>
   );
 };
@@ -45,6 +71,7 @@ const CustomDrawerContent = (props) => {
       <DrawerItemList {...props} />
       <DrawerItem
         label="Docs"
+        icon={(props) => <Ionicons name="md-paper" {...props} />}
         onPress={
           () =>
             WebBrowser.openBrowserAsync(
@@ -55,32 +82,10 @@ const CustomDrawerContent = (props) => {
       />
       <DrawerItem
         label="Logout"
+        icon={(props) => <Ionicons name="md-log-out" {...props} />}
         onPress={() => props.context.setLogin(false)}
       />
     </DrawerContentScrollView>
-  );
-};
-
-const AboutStack = createStackNavigator();
-const AboutStackNavigator = () => {
-  return (
-    <AboutStack.Navigator>
-      <AboutStack.Screen
-        name="About"
-        component={AboutScreen}
-        options={({ navigation }) => ({
-          headerLeft: () => <DrawerButton navigation={navigation} />,
-        })}
-      />
-    </AboutStack.Navigator>
-  );
-};
-
-const AboutScreen = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <Text>AboutScreen</Text>
-    </View>
   );
 };
 
