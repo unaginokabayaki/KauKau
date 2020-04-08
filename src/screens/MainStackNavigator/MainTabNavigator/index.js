@@ -12,7 +12,9 @@ import styles from './styles';
 const MainTab = createBottomTabNavigator();
 const MainTabNavigator = ({ navigation }) => {
   return (
-    <MainTab.Navigator tabBarOptions={{ showLabel: true }}>
+    <MainTab.Navigator
+      tabBarOptions={{ showLabel: true, activeTintColor: '#e91e63' }}
+    >
       <MainTab.Screen
         name="Home"
         component={HomeStackNavigator}
