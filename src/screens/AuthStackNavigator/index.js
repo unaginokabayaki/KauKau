@@ -10,8 +10,8 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
 import { Button, Icon, Input, CheckBox } from 'react-native-elements';
-// import { FontAwesome5 } from '@expo/vector-icons';
 
+import firebase from 'app/src/firebase';
 import styles from './styles';
 
 const AuthStack = createStackNavigator();
@@ -29,6 +29,17 @@ const LoginScreen = ({ navigation }) => {
   let [email, setEmail] = React.useState('');
   let [password, setPassword] = React.useState('');
   let [rememberLogin, setRememberLogin] = React.useState(false);
+
+  login = async () => {
+    let result = await firebase.basicLogin(email, password);
+    if (result.error) {
+      alert(result.error);
+    } else {
+      alert('Successfully logged in!');
+
+      context.setLogin(true);
+    }
+  };
 
   return (
     <KeyboardAvoidingView behavior="position" style={styles.container}>
@@ -87,7 +98,7 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <Button
           title="LOG IN"
-          onPress={() => context.setLogin(true)}
+          onPress={login}
           buttonStyle={{
             backgroundColor: '#FF9800',
             borderRadius: 10,
@@ -126,22 +137,61 @@ const InputBaseSign = (props) => {
 
 const SignupScreen = () => {
   let context = StateContainer.useContainer();
+  let [username, setUsername] = React.useState('');
+  let [email, setEmail] = React.useState('');
+  let [password, setPassword] = React.useState('');
+  let [confPassword, setConfPassword] = React.useState('');
+
+  signup = () => {
+    let result = irebase.basicSignin(email, password);
+    if (result.error) {
+      alert(result.error);
+    } else {
+      alert('Account has been created!');
+
+      context.setLogin(true);
+    }
+  };
+
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={[styles.headerContainer, { padding: 10 }]}>
         <Text style={styles.heading}>USER REGISTRATION</Text>
       </View>
       <View style={{ padding: 10 }}>
-        <InputBaseSign placeholder="Username" />
-        <InputBaseSign placeholder="Email" />
-        <InputBaseSign placeholder="Address" />
-        <InputBaseSign placeholder="Phone" />
+        <InputBaseSign
+          placeholder="Username"
+          value={username}
+          onChangeText={(value) => setUsername(value)}
+        />
+        <InputBaseSign
+          placeholder="Email"
+          value={email}
+          onChangeText={(value) => {
+            setEmail(value);
+          }}
+        />
+        <InputBaseSign
+          placeholder="Password"
+          value={password}
+          onChangeText={(value) => {
+            setPassword(value);
+          }}
+        />
+        <InputBaseSign
+          placeholder="Confirm Password"
+          value={confPassword}
+          onChangeText={(value) => {
+            setConfPassword(value);
+          }}
+        />
         <Button
           title="SIGN UP"
           buttonStyle={{
             borderRadius: 10,
           }}
           containerStyle={{ marginHorizontal: 30, marginTop: 10 }}
+          onPress={signup}
         />
       </View>
     </ScrollView>
