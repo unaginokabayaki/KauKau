@@ -18,6 +18,8 @@ export default styles = StyleSheet.create({
     alignItems: 'stretch',
     padding: 30,
   },
+  roundButtonStyle: { borderRadius: 30 },
+  roundButtonContainer: { marginTop: 10 },
   inputStyle: {},
   inputContainerStyle: {},
 });

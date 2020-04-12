@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
@@ -18,9 +19,85 @@ const AuthStack = createStackNavigator();
 const AuthStackNavigator = () => {
   return (
     <AuthStack.Navigator>
+      <AuthStack.Screen name="Start" component={StartScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
+      <AuthStack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+      />
     </AuthStack.Navigator>
+  );
+};
+
+const StartScreen = ({ navigation }) => {
+  let context = StateContainer.useContainer();
+  React.useEffect(() => {
+    console.log('StartScreen');
+
+    (async () => {
+      let uid = await firebase.checkLoginUser();
+      if (uid) {
+        console.log('SkipAuth:' + uid);
+        context.login();
+      }
+    })();
+  }, []);
+
+  useGoogleAccount = async () => {
+    await firebase.signInWithGoogle();
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Icon type="FontAwesome5" name="store" size={64} color={'white'} />
+        <Text style={styles.heading}>KAUKAU</Text>
+      </View>
+      <View style={styles.formContainer}>
+        <Button
+          title="CREATE ACCOUNT"
+          icon={{
+            name: 'md-arrow-forward',
+            type: 'ionicon',
+            color: '#007aff',
+          }}
+          iconRight
+          onPress={() => navigation.navigate('Signup')}
+          type="outline"
+          buttonStyle={styles.roundButtonStyle}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Login with email"
+          icon={{ name: 'md-mail', type: 'ionicon', color: 'white' }}
+          onPress={() => navigation.navigate('Login')}
+          buttonStyle={styles.roundButtonStyle}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Login with Google"
+          icon={{ name: 'google', type: 'font-awesome', color: 'white' }}
+          onPress={useGoogleAccount}
+          buttonStyle={{ ...styles.roundButtonStyle, backgroundColor: 'green' }}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Login with Github"
+          icon={{ name: 'github', type: 'font-awesome', color: 'white' }}
+          onPress={() => alert('todo')}
+          buttonStyle={{ ...styles.roundButtonStyle, backgroundColor: 'black' }}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Try now"
+          type="clear"
+          onPress={() => context.login()}
+          buttonStyle={styles.roundButtonStyle}
+          containerStyle={styles.roundButtonContainer}
+        />
+      </View>
+    </View>
   );
 };
 
@@ -30,22 +107,40 @@ const LoginScreen = ({ navigation }) => {
   let [password, setPassword] = React.useState('');
   let [rememberLogin, setRememberLogin] = React.useState(false);
 
+  React.useEffect(() => {
+    console.log('LoginScreen');
+  }, []);
+
   login = async () => {
     let result = await firebase.basicLogin(email, password);
-    if (result.error) {
-      alert(result.error);
-    } else {
-      alert('Successfully logged in!');
 
-      context.setLogin(true);
+    if (result.error) {
+      Alert.alert('Error', result.error);
+    } else {
+      // メール承認済みでない場合ログインさせない
+      if (!result.emailVerified) {
+        // メール承認済みでない場合、承認リンクを再度送るか確認
+        Alert.alert(
+          'Verify Email',
+          'You need to verify email before login. Would you like us to resend link again?',
+          [
+            { text: 'No' },
+            { text: 'Yes', onPress: firebase.resendEmailVerifyLink() },
+          ]
+        );
+        return;
+      }
+
+      Alert.alert('Successfully logged in!');
+
+      context.login();
     }
   };
 
   return (
-    <KeyboardAvoidingView behavior="position" style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Icon type="FontAwesome5" name="store" size={64} color={'white'} />
-        <Text style={styles.heading}>KAUKAU</Text>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <View style={[styles.headerContainer, { padding: 10 }]}>
+        <Text style={styles.heading}>LOGIN WITH EMAIL</Text>
       </View>
       <View style={styles.formContainer}>
         <View>
@@ -104,16 +199,68 @@ const LoginScreen = ({ navigation }) => {
             borderRadius: 10,
           }}
           containerStyle={{ marginHorizontal: 30, marginTop: 16 }}
-        ></Button>
+        />
         <Button
-          title="SIGN UP"
-          onPress={() => navigation.navigate('Signup')}
-          type="outline"
-          buttonStyle={{
-            borderRadius: 30,
-          }}
+          title="Forgot Password?"
+          onPress={() => navigation.navigate('ForgotPassword')}
+          type="clear"
           containerStyle={{ marginHorizontal: 30, marginTop: 10 }}
-        ></Button>
+        />
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
+const ForgotPasswordScreen = ({ navigation }) => {
+  let context = StateContainer.useContainer();
+  let [email, setEmail] = React.useState('');
+
+  sendPasswordRestLink = async () => {
+    let { error } = await firebase.sendPasswordResetEail(email);
+    if (!error) {
+      Alert.alert(
+        'We sent password reset link to your email address. Please check.'
+      );
+    } else {
+      Alert.alert('Error', error);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <View style={[styles.headerContainer, { padding: 10 }]}>
+        <Text style={styles.heading}>RESET PASSWORD</Text>
+      </View>
+      <View style={styles.formContainer}>
+        <View>
+          <Input
+            placeholder="Email"
+            leftIcon={
+              <Icon
+                type="simple-line-icon"
+                name="envelope"
+                size={24}
+                color={'rgba(0,0,0,0.38)'}
+                style={{ backgroundColor: 'transparent' }}
+                containerStyle={{ paddingRight: 10 }}
+              />
+            }
+            containerStyle={{ marginTop: 16 }}
+            keyboardType="email-address"
+            returnKeyType="next"
+            value={email}
+            onChangeText={(value) => setEmail(value)}
+          />
+        </View>
+        <Button
+          title="RESET PASSWORD"
+          onPress={sendPasswordRestLink}
+          buttonStyle={{
+            backgroundColor: '#FF9800',
+            borderRadius: 10,
+          }}
+          containerStyle={{ marginHorizontal: 30, marginTop: 16 }}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -142,14 +289,15 @@ const SignupScreen = () => {
   let [password, setPassword] = React.useState('');
   let [confPassword, setConfPassword] = React.useState('');
 
-  signup = () => {
-    let result = irebase.basicSignin(email, password);
-    if (result.error) {
-      alert(result.error);
-    } else {
-      alert('Account has been created!');
+  signup = async () => {
+    let result = await firebase.basicSignup(email, password, username);
 
-      context.setLogin(true);
+    if (result.error) {
+      Alert.alert('Error', error);
+    } else {
+      Alert.alert('Account has been created!');
+
+      context.login();
     }
   };
 
@@ -163,6 +311,7 @@ const SignupScreen = () => {
           placeholder="Username"
           value={username}
           onChangeText={(value) => setUsername(value)}
+          keyboardType="ascii-capable"
         />
         <InputBaseSign
           placeholder="Email"
@@ -170,6 +319,7 @@ const SignupScreen = () => {
           onChangeText={(value) => {
             setEmail(value);
           }}
+          keyboardType="email-address"
         />
         <InputBaseSign
           placeholder="Password"
@@ -177,6 +327,7 @@ const SignupScreen = () => {
           onChangeText={(value) => {
             setPassword(value);
           }}
+          secureTextEntry
         />
         <InputBaseSign
           placeholder="Confirm Password"
@@ -184,6 +335,7 @@ const SignupScreen = () => {
           onChangeText={(value) => {
             setConfPassword(value);
           }}
+          secureTextEntry
         />
         <Button
           title="SIGN UP"

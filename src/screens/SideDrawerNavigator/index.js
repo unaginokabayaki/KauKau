@@ -15,6 +15,7 @@ import DrawerButton from 'app/src/common/DrawerButton';
 import MainStackNavigator from 'app/src/screens/MainStackNavigator';
 import AboutStackNavigator from 'app/src/screens/SideDrawerNavigator/AboutStackNavigator';
 
+import firebase from 'app/src/firebase';
 import styles from './styles';
 
 const SideDrawer = createDrawerNavigator();
@@ -83,7 +84,10 @@ const CustomDrawerContent = (props) => {
       <DrawerItem
         label="Logout"
         icon={(props) => <Ionicons name="md-log-out" {...props} />}
-        onPress={() => props.context.setLogin(false)}
+        onPress={() => {
+          firebase.logout();
+          props.context.setLogin(false);
+        }}
       />
     </DrawerContentScrollView>
   );
