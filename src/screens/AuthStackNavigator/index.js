@@ -48,6 +48,18 @@ const StartScreen = ({ navigation }) => {
     await firebase.signInWithGoogle();
   };
 
+  useGithubAccount = async () => {
+    await firebase.signInWithGithub();
+  };
+
+  useSlackAccount = async () => {
+    await firebase.signInWithSlack();
+  };
+
+  useYahooAccount = async () => {
+    await firebase.signInWithYahoo();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -85,8 +97,28 @@ const StartScreen = ({ navigation }) => {
         <Button
           title="Login with Github"
           icon={{ name: 'github', type: 'font-awesome', color: 'white' }}
-          onPress={() => alert('todo')}
+          onPress={useGithubAccount}
           buttonStyle={{ ...styles.roundButtonStyle, backgroundColor: 'black' }}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Login with Slack"
+          icon={{ name: 'slack', type: 'font-awesome', color: 'white' }}
+          onPress={useSlackAccount}
+          buttonStyle={{
+            ...styles.roundButtonStyle,
+            backgroundColor: 'orange',
+          }}
+          containerStyle={styles.roundButtonContainer}
+        />
+        <Button
+          title="Login with Yahoo"
+          icon={{ name: 'yahoo', type: 'font-awesome', color: 'white' }}
+          onPress={useYahooAccount}
+          buttonStyle={{
+            ...styles.roundButtonStyle,
+            backgroundColor: 'purple',
+          }}
           containerStyle={styles.roundButtonContainer}
         />
         <Button
@@ -112,13 +144,13 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   login = async () => {
-    let result = await firebase.basicLogin(email, password);
+    let { user, error } = await firebase.basicLogin(email, password);
 
-    if (result.error) {
-      Alert.alert('Error', result.error);
+    if (error) {
+      Alert.alert('Error', error);
     } else {
       // メール承認済みでない場合ログインさせない
-      if (!result.emailVerified) {
+      if (!user.emailVerified) {
         // メール承認済みでない場合、承認リンクを再度送るか確認
         Alert.alert(
           'Verify Email',
@@ -290,9 +322,9 @@ const SignupScreen = () => {
   let [confPassword, setConfPassword] = React.useState('');
 
   signup = async () => {
-    let result = await firebase.basicSignup(email, password, username);
+    let { uid, error } = await firebase.basicSignup(email, password, username);
 
-    if (result.error) {
+    if (error) {
       Alert.alert('Error', error);
     } else {
       Alert.alert('Account has been created!');

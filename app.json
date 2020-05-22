@@ -2,6 +2,7 @@
   "expo": {
     "name": "KauKau",
     "slug": "KauKau",
+    "scheme": "kaukau",
     "platforms": [
       "ios",
       "android",

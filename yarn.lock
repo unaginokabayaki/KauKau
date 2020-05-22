@@ -3136,6 +3136,13 @@ expand-brackets@^2.1.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
+expo-app-auth@~9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/expo-app-auth/-/expo-app-auth-9.0.0.tgz#879893b90bb083acd705012495bc907cd5d700e7"
+  integrity sha512-loDPUxVNhCJVxjDdLevoApOBQkcK8QQXSNyWqKIAvzwjuxQQ7EtwSXOVMThsPU/wWCHOW/Zbj7ykBYUmJi6jLA==
+  dependencies:
+    invariant "^2.2.4"
+
 expo-asset@~8.1.3:
   version "8.1.4"
   resolved "https://registry.yarnpkg.com/expo-asset/-/expo-asset-8.1.4.tgz#5265c28c1c279b2f9779269195bec4caf250ba5d"
@@ -3146,6 +3153,14 @@ expo-asset@~8.1.3:
     md5-file "^3.2.3"
     path-browserify "^1.0.0"
     url-parse "^1.4.4"
+
+expo-auth-session@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/expo-auth-session/-/expo-auth-session-1.0.0.tgz#2a2568c3ab6065b78e875ffeef52129865bf2b2a"
+  integrity sha512-LFaUtM6SQqyXCfekMjxeKynG0kHeCXZVBh/hvDB8SFAMR5UYKI+R7C16F78BKR1o02pgA2wcAPPDrlOab2xAJg==
+  dependencies:
+    expo-constants "~9.0.0"
+    expo-web-browser "~8.1.0"
 
 expo-constants@~9.0.0:
   version "9.0.0"
@@ -3170,6 +3185,14 @@ expo-font@~8.1.0:
   integrity sha512-c8hY1E6VxDHJTJ91/5Tvr1UEc8acvn50BDiXz7vTvCeH3puDoCDq1weSsXIjKwuF6nF2NJbLQ0Ynenr3k7fiRA==
   dependencies:
     fontfaceobserver "^2.1.0"
+
+expo-google-app-auth@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/expo-google-app-auth/-/expo-google-app-auth-8.1.0.tgz#2f173cdd47733311ccdae911a1a6c74963a3593b"
+  integrity sha512-7daHlFd9zNMOpY49EPBVtgY+KUeI1/dFooEGNoQZcXPQGDo1Sw9AYqyYJvYNXni4n0sFHCFFHxEHL11ECXZzaw==
+  dependencies:
+    expo-app-auth "~9.0.0"
+    expo-constants "~9.0.0"
 
 expo-keep-awake@~8.1.0:
   version "8.1.0"
