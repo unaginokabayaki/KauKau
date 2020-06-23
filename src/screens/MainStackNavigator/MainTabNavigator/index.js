@@ -6,6 +6,7 @@ import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 import DrawerButton from 'app/src/common/DrawerButton';
+import RegisterStackNavigator from 'app/src/screens/MainStackNavigator/MainTabNavigator/RegisterStackNavigator';
 
 import styles from './styles';
 
@@ -86,28 +87,6 @@ const ItemScreen = ({ navigation }) => {
   );
 };
 
-const RegisterStack = createStackNavigator();
-const RegisterStackNavigator = () => {
-  return (
-    <RegisterStack.Navigator>
-      <RegisterStack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={({ navigation }) => ({
-          headerLeft: () => <DrawerButton navigation={navigation} />,
-        })}
-      />
-    </RegisterStack.Navigator>
-  );
-};
-
-const RegisterScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text>RegisterScreen</Text>
-    </View>
-  );
-};
 
 const NotificationStack = createStackNavigator();
 const NotificationStackNavigator = () => {
