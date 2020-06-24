@@ -11,7 +11,8 @@ export default styles = StyleSheet.create({
   imageBox: {
     height: 64,
     width: 64,
-    margin: 12,
+    marginVertical: 12,
+    marginHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,

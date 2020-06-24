@@ -5829,6 +5829,11 @@ react-native-dotenv@^0.2.0:
   dependencies:
     babel-plugin-dotenv "0.1.1"
 
+react-native-drag-sort@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-drag-sort/-/react-native-drag-sort-2.2.1.tgz#1eec8f3c82e8c94c5fd75440df59bce429951009"
+  integrity sha512-VZxMwWFnmQVbh3q9BqDGo7IbEqirejg/M31TUpjQOaqSPMm7gNyYnGse7jDh86zkM96+SXwH5n+W8Z4vTCbCNQ==
+
 react-native-drawer@2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/react-native-drawer/-/react-native-drawer-2.5.1.tgz#08b9314184f48c724f1b467f8859797369798654"
