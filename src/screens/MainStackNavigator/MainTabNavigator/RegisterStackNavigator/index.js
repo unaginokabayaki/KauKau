@@ -1,14 +1,25 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, Text, View, Dimensions } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+  Dimensions,
+  TextInput,
+  FlatList,
+} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import DrawerButton from 'app/src/common/DrawerButton';
+
+import { ListItem } from 'react-native-elements';
 
 import styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 
 import { DragSortableView, AutoDragSortableView } from 'react-native-drag-sort';
+import { List } from 'native-base';
 
 const numOfImage = 5;
 
@@ -32,21 +43,30 @@ const RegisterStackNavigator = () => {
           headerLeft: () => <DrawerButton navigation={navigation} />,
         })}
       />
+      <RegisterStack.Screen
+        name="Category"
+        component={SelectCategoryScreen}
+        options={{
+          headerBackTitle: 'キャンセル',
+        }}
+      />
     </RegisterStack.Navigator>
   );
 };
 
-const RegisterScreen = () => {
+const RegisterScreen = ({ navigation }) => {
   let [data, setData] = React.useState([]);
   // let [numOfImage] = React.useState(10);
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
   let [parentWidth, setParentWidth] = React.useState(0);
 
+  let [category, setCategory] = React.useState('');
+
   React.useEffect(() => {
     let newdata = [
-      { image: 'test.png' },
-      { image: 'test.png' },
-      { image: 'test.png' },
+      // { image: 'test.png' },
+      // { image: 'test.png' },
+      // { image: 'test.png' },
     ];
     setData(newdata);
     setParentWidth(childrenWidth * newdata.length);
@@ -175,14 +195,86 @@ const RegisterScreen = () => {
         </View>
         <View style={{ height: 200 }}>
           <Text>商品名と説明</Text>
-          <View style={{ flex: 1, backgroundColor: 'white' }}></View>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: 'lightgray',
+                marginHorizontal: 10,
+              }}
+            >
+              <TextInput style={{ marginTop: 15 }} maxLength={30} />
+              <Text
+                style={{
+                  color: 'silver',
+                  textAlign: 'right',
+                  marginRight: 5,
+                }}
+              >
+                1/30
+              </Text>
+            </View>
+            <View style={{ flex: 1, marginHorizontal: 10, marginVertical: 10 }}>
+              <TextInput style={{ flex: 1 }} multiline maxLength={1000} />
+              <Text
+                style={{ color: 'silver', textAlign: 'right', marginRight: 5 }}
+              >
+                1/1000
+              </Text>
+            </View>
+          </View>
         </View>
         <View style={{ height: 200 }}>
           <Text>商品情報</Text>
-          <View style={{ flex: 1, backgroundColor: 'white' }}></View>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <ListItem
+              title="カテゴリ"
+              bottomDivider
+              chevron
+              onPress={() =>
+                // 更新関数をパラメータで渡す
+                navigation.navigate('Category', {
+                  setCategory,
+                })
+              }
+              rightElement={category}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+};
+
+const SelectCategoryScreen = ({ navigation, route }) => {
+  const list = [
+    { title: '書籍・CD・DVD' },
+    { title: '家電・スマホ・PC' },
+    { title: 'ゲーム・おもちゃ' },
+    { title: '衣服・靴' },
+    { title: 'その他' },
+  ];
+
+  renderItem = ({ item }) => {
+    return (
+      <ListItem
+        title={item.title}
+        bottomDivider
+        onPress={() => {
+          // 遷移元から渡した関数を呼ぶ
+          route.params.setCategory(item.title);
+          navigation.goBack();
+        }}
+      />
+    );
+  };
+
+  return (
+    <FlatList
+      data={list}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={renderItem}
+    ></FlatList>
   );
 };
 
