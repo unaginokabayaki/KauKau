@@ -54,7 +54,7 @@ const RegisterStackNavigator = () => {
   );
 };
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation, route }) => {
   let [data, setData] = React.useState([]);
   // let [numOfImage] = React.useState(10);
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
@@ -71,6 +71,21 @@ const RegisterScreen = ({ navigation }) => {
     setData(newdata);
     setParentWidth(childrenWidth * newdata.length);
   }, []);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('register screen get focused');
+    });
+  }, [navigation]);
+
+  // 選択画面での選択値を受け取る
+  React.useEffect(() => {
+    if (route.params?.category) {
+      setCategory(route.params.category);
+    }
+  }, [route.params?.category]);
+
+  React.useLayoutEffect(() => {}, []);
 
   const AddImageNew = () => {
     addData = () => {
@@ -146,6 +161,18 @@ const RegisterScreen = ({ navigation }) => {
   // imageFlameWidth = () => {
   //   return childrenWidth * data.length;
   // };
+
+  const SelectedCategory = () => {
+    if (category == '') {
+      return <Text style={{ color: 'silver' }}>(必須)</Text>;
+    } else {
+      return <Text>{category}</Text>;
+    }
+  };
+
+  selectCategoryCallback = () => {
+    console.log('sss');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -231,13 +258,8 @@ const RegisterScreen = ({ navigation }) => {
               title="カテゴリ"
               bottomDivider
               chevron
-              onPress={() =>
-                // 更新関数をパラメータで渡す
-                navigation.navigate('Category', {
-                  setCategory,
-                })
-              }
-              rightElement={category}
+              onPress={() => navigation.navigate('Category')}
+              rightElement={SelectedCategory()}
             />
           </View>
         </View>
@@ -262,8 +284,10 @@ const SelectCategoryScreen = ({ navigation, route }) => {
         bottomDivider
         onPress={() => {
           // 遷移元から渡した関数を呼ぶ
-          route.params.setCategory(item.title);
-          navigation.goBack();
+          // route.params.setCategory(item.title);
+          // navigation.goBack();
+          // 元画面に返す
+          navigation.navigate('Register', { category: item.title });
         }}
       />
     );
