@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  KeyboardAvoidingView,
   SafeAreaView,
   ScrollView,
   Text,
@@ -50,6 +51,13 @@ const RegisterStackNavigator = () => {
           headerBackTitle: 'キャンセル',
         }}
       />
+      <RegisterStack.Screen
+        name="Condition"
+        component={SelectConditionScreen}
+        options={{
+          headerBackTitle: 'キャンセル',
+        }}
+      />
     </RegisterStack.Navigator>
   );
 };
@@ -61,6 +69,14 @@ const RegisterScreen = ({ navigation, route }) => {
   let [parentWidth, setParentWidth] = React.useState(0);
 
   let [category, setCategory] = React.useState('');
+  let [condition, setCondition] = React.useState('');
+  let [price, setPrice] = React.useState('');
+
+  let [form, setForm] = React.useState({ title: '', description: '' });
+  let [wordCounter, setWordCounter] = React.useState({
+    title: 0,
+    description: 0,
+  });
 
   React.useEffect(() => {
     let newdata = [
@@ -78,12 +94,15 @@ const RegisterScreen = ({ navigation, route }) => {
     });
   }, [navigation]);
 
-  // 選択画面での選択値を受け取る
+  // 選択画面での選択値を受け取って更新
   React.useEffect(() => {
     if (route.params?.category) {
       setCategory(route.params.category);
     }
-  }, [route.params?.category]);
+    if (route.params?.condition) {
+      setCondition(route.params.condition);
+    }
+  }, [route.params?.category, route.params?.condition]);
 
   React.useLayoutEffect(() => {}, []);
 
@@ -164,18 +183,51 @@ const RegisterScreen = ({ navigation, route }) => {
 
   const SelectedCategory = () => {
     if (category == '') {
-      return <Text style={{ color: 'silver' }}>(必須)</Text>;
+      return <Text style={{ color: 'silver' }}>(任意)</Text>;
     } else {
       return <Text>{category}</Text>;
     }
   };
 
-  selectCategoryCallback = () => {
-    console.log('sss');
+  const SelectedCondition = () => {
+    if (condition == '') {
+      return <Text style={{ color: 'silver' }}>(必須)</Text>;
+    } else {
+      return <Text>{condition}</Text>;
+    }
+  };
+
+  const InputPrice = () => {
+    return (
+      <View style={{ flex: 1, alignItems: 'flex-end' }}>
+        <TextInput
+          keyboardType="number-pad"
+          placeholder="¥300 ~ ¥1,000,000"
+          value={price}
+          onFocus={() => {
+            let plane = price.replace('¥', '');
+            plane = plane.replace(',', '');
+            setPrice(plane);
+            // setPrice(price.slice(1));
+          }}
+          onChangeText={(text) => {
+            setPrice(text);
+          }}
+          onBlur={() => {
+            if (price != '') {
+              let fmt = price.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+              setPrice('¥' + fmt);
+            }
+          }}
+          returnKeyType={'done'}
+          onSubmitEditing={() => {}}
+        />
+      </View>
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <ScrollView>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
@@ -230,7 +282,20 @@ const RegisterScreen = ({ navigation, route }) => {
                 marginHorizontal: 10,
               }}
             >
-              <TextInput style={{ marginTop: 15 }} maxLength={30} />
+              <TextInput
+                style={{ marginTop: 15 }}
+                maxLength={30}
+                value={form.title}
+                onChangeText={(text) => {
+                  // 文字を数える
+                  let len = text.length;
+                  setWordCounter({ ...wordCounter, title: len });
+                  // value更新
+                  setForm({ ...form, title: text });
+                }}
+                placeholder={'タイトル'}
+                returnKeyType={'done'}
+              />
               <Text
                 style={{
                   color: 'silver',
@@ -238,20 +303,33 @@ const RegisterScreen = ({ navigation, route }) => {
                   marginRight: 5,
                 }}
               >
-                1/30
+                {wordCounter.title}/30
               </Text>
             </View>
             <View style={{ flex: 1, marginHorizontal: 10, marginVertical: 10 }}>
-              <TextInput style={{ flex: 1 }} multiline maxLength={1000} />
+              <TextInput
+                style={{ flex: 1 }}
+                multiline
+                maxLength={1000}
+                value={form.description}
+                onChapngeText={(text) => {
+                  // 文字を数える
+                  let len = text.length;
+                  setWordCounter({ ...wordCounter, description: len });
+                  // value更新
+                  setForm({ ...form, description: text });
+                }}
+                placeholder={'商品説明を記載してください。'}
+              />
               <Text
                 style={{ color: 'silver', textAlign: 'right', marginRight: 5 }}
               >
-                1/1000
+                {wordCounter.description}/1000
               </Text>
             </View>
           </View>
         </View>
-        <View style={{ height: 200 }}>
+        <View style={{ height: 120 }}>
           <Text>商品情報</Text>
           <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ListItem
@@ -261,10 +339,33 @@ const RegisterScreen = ({ navigation, route }) => {
               onPress={() => navigation.navigate('Category')}
               rightElement={SelectedCategory()}
             />
+            <ListItem
+              title="状態"
+              bottomDivider
+              chevron
+              onPress={() => navigation.navigate('Condition')}
+              rightElement={SelectedCondition()}
+            />
+          </View>
+        </View>
+        <View style={{ height: 500 }}>
+          <Text>価格</Text>
+          <View style={{ flex: 1 }}>
+            <ListItem
+              style={{ backgroundColor: 'white' }}
+              title="商品価格"
+              bottomDivider
+              rightElement={InputPrice()}
+            />
+            <ListItem
+              style={{ backgroundColor: 'lightgray' }}
+              title="手数料"
+              bottomDivider
+            />
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -288,6 +389,38 @@ const SelectCategoryScreen = ({ navigation, route }) => {
           // navigation.goBack();
           // 元画面に返す
           navigation.navigate('Register', { category: item.title });
+        }}
+      />
+    );
+  };
+
+  return (
+    <FlatList
+      data={list}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={renderItem}
+    ></FlatList>
+  );
+};
+
+const SelectConditionScreen = ({ navigation, route }) => {
+  const list = [
+    { title: '新品・未使用' },
+    { title: '未使用に近い' },
+    { title: '目立った傷や汚れなし' },
+    { title: 'やや傷や汚れあり' },
+    { title: '傷や汚れあり' },
+    { title: '全体的に状態が悪い' },
+  ];
+
+  renderItem = ({ item }) => {
+    return (
+      <ListItem
+        title={item.title}
+        bottomDivider
+        onPress={() => {
+          // 元画面に返す
+          navigation.navigate('Register', { condition: item.title });
         }}
       />
     );

@@ -170,76 +170,78 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <View style={[styles.headerContainer, { padding: 10 }]}>
-        <Text style={styles.heading}>LOGIN WITH EMAIL</Text>
-      </View>
-      <View style={styles.formContainer}>
-        <View>
-          <Input
-            placeholder="Email"
-            leftIcon={
-              <Icon
-                type="simple-line-icon"
-                name="envelope"
-                size={24}
-                color={'rgba(0,0,0,0.38)'}
-                style={{ backgroundColor: 'transparent' }}
-                containerStyle={{ paddingRight: 10 }}
-              />
-            }
-            containerStyle={{ marginTop: 16 }}
-            keyboardType="email-address"
-            returnKeyType="next"
-            value={email}
-            onChangeText={(value) => setEmail(value)}
-          />
-          <Input
-            placeholder="Password"
-            leftIcon={
-              <Icon
-                type="simple-line-icon"
-                name="lock"
-                size={24}
-                color={'rgba(0,0,0,0.38)'}
-                style={{ backgroundColor: 'transparent' }}
-                containerStyle={{ paddingRight: 10 }}
-              />
-            }
-            containerStyle={{ marginTop: 16 }}
-            secureTextEntry
-            returnKeyType="done"
-            value={password}
-            onChangeText={(value) => setPassword(value)}
-          />
-          <CheckBox
-            title="Remember Login"
-            containerStyle={{
-              marginTop: 16,
-              backgroundColor: 'transparent',
-              borderWidth: 0,
+    <SafeAreaView>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <View style={[styles.headerContainer, { padding: 10 }]}>
+          <Text style={styles.heading}>LOGIN WITH EMAIL</Text>
+        </View>
+        <View style={styles.formContainer}>
+          <View>
+            <Input
+              placeholder="Email"
+              leftIcon={
+                <Icon
+                  type="simple-line-icon"
+                  name="envelope"
+                  size={24}
+                  color={'rgba(0,0,0,0.38)'}
+                  style={{ backgroundColor: 'transparent' }}
+                  containerStyle={{ paddingRight: 10 }}
+                />
+              }
+              containerStyle={{ marginTop: 16 }}
+              keyboardType="email-address"
+              returnKeyType="next"
+              value={email}
+              onChangeText={(value) => setEmail(value)}
+            />
+            <Input
+              placeholder="Password"
+              leftIcon={
+                <Icon
+                  type="simple-line-icon"
+                  name="lock"
+                  size={24}
+                  color={'rgba(0,0,0,0.38)'}
+                  style={{ backgroundColor: 'transparent' }}
+                  containerStyle={{ paddingRight: 10 }}
+                />
+              }
+              containerStyle={{ marginTop: 16 }}
+              secureTextEntry
+              returnKeyType="done"
+              value={password}
+              onChangeText={(value) => setPassword(value)}
+            />
+            <CheckBox
+              title="Remember Login"
+              containerStyle={{
+                marginTop: 16,
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+              }}
+              checked={rememberLogin}
+              onPress={() => setRememberLogin(!rememberLogin)}
+            />
+          </View>
+          <Button
+            title="LOG IN"
+            onPress={login}
+            buttonStyle={{
+              backgroundColor: '#FF9800',
+              borderRadius: 10,
             }}
-            checked={rememberLogin}
-            onPress={() => setRememberLogin(!rememberLogin)}
+            containerStyle={{ marginHorizontal: 30, marginTop: 16 }}
+          />
+          <Button
+            title="Forgot Password?"
+            onPress={() => navigation.navigate('ForgotPassword')}
+            type="clear"
+            containerStyle={{ marginHorizontal: 30, marginTop: 10 }}
           />
         </View>
-        <Button
-          title="LOG IN"
-          onPress={login}
-          buttonStyle={{
-            backgroundColor: '#FF9800',
-            borderRadius: 10,
-          }}
-          containerStyle={{ marginHorizontal: 30, marginTop: 16 }}
-        />
-        <Button
-          title="Forgot Password?"
-          onPress={() => navigation.navigate('ForgotPassword')}
-          type="clear"
-          containerStyle={{ marginHorizontal: 30, marginTop: 10 }}
-        />
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
