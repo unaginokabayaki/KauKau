@@ -9,7 +9,7 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 
@@ -78,6 +78,8 @@ const RegisterScreen = ({ navigation, route }) => {
     title: 0,
     description: 0,
   });
+
+  const headerHeight = useHeaderHeight();
 
   React.useEffect(() => {
     let newdata = [
@@ -250,7 +252,11 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={headerHeight + 64}
+    >
       <ScrollView>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
@@ -335,7 +341,7 @@ const RegisterScreen = ({ navigation, route }) => {
                 multiline
                 maxLength={1000}
                 value={form.description}
-                onChapngeText={(text) => {
+                onChangeText={(text) => {
                   // 文字を数える
                   let len = text.length;
                   setWordCounter({ ...wordCounter, description: len });
@@ -390,7 +396,7 @@ const RegisterScreen = ({ navigation, route }) => {
         </View>
         <View
           style={{
-            height: 300,
+            height: 100,
             flexDirection: 'row',
             backgroundColor: 'white',
           }}
