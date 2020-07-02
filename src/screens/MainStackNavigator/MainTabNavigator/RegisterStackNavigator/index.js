@@ -13,7 +13,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 
-import { ListItem } from 'react-native-elements';
+import { ListItem, Button } from 'react-native-elements';
 
 import styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -71,6 +71,7 @@ const RegisterScreen = ({ navigation, route }) => {
   let [category, setCategory] = React.useState('');
   let [condition, setCondition] = React.useState('');
   let [price, setPrice] = React.useState('');
+  let [formattedPrice, setFormattedPrice] = React.useState('');
 
   let [form, setForm] = React.useState({ title: '', description: '' });
   let [wordCounter, setWordCounter] = React.useState({
@@ -205,9 +206,7 @@ const RegisterScreen = ({ navigation, route }) => {
           placeholder="¥300 ~ ¥1,000,000"
           value={price}
           onFocus={() => {
-            let plane = price.replace('¥', '');
-            plane = plane.replace(',', '');
-            setPrice(plane);
+            setPrice(convertFromCurrency(price));
             // setPrice(price.slice(1));
           }}
           onChangeText={(text) => {
@@ -215,13 +214,37 @@ const RegisterScreen = ({ navigation, route }) => {
           }}
           onBlur={() => {
             if (price != '') {
-              let fmt = price.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-              setPrice('¥' + fmt);
+              setPrice(convertToCurrency(price));
             }
           }}
           returnKeyType={'done'}
           onSubmitEditing={() => {}}
         />
+      </View>
+    );
+  };
+
+  convertToCurrency = (num) => {
+    return '¥' + num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+  };
+
+  convertFromCurrency = (num) => {
+    let plane = price.replace('¥', '');
+    plane = plane.replace(',', '');
+    plane = plane.replace(' ', '');
+    return plane;
+  };
+
+  const DealingFee = () => {
+    let ans = convertFromCurrency(price) * 0.05;
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'flex-end',
+        }}
+      >
+        <Text style={{ color: 'silver' }}>{convertToCurrency(ans)}</Text>
       </View>
     );
   };
@@ -348,9 +371,9 @@ const RegisterScreen = ({ navigation, route }) => {
             />
           </View>
         </View>
-        <View style={{ height: 500 }}>
+        <View style={{ height: 120 }}>
           <Text>価格</Text>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ListItem
               style={{ backgroundColor: 'white' }}
               title="商品価格"
@@ -358,11 +381,34 @@ const RegisterScreen = ({ navigation, route }) => {
               rightElement={InputPrice()}
             />
             <ListItem
-              style={{ backgroundColor: 'lightgray' }}
-              title="手数料"
+              containerStyle={{ backgroundColor: 'whitesmoke' }}
+              title="手数料(5%)"
               bottomDivider
+              rightElement={DealingFee()}
             />
           </View>
+        </View>
+        <View
+          style={{
+            height: 300,
+            flexDirection: 'row',
+            backgroundColor: 'white',
+          }}
+        >
+          <Button
+            title="下書きに保存する"
+            type="outline"
+            containerStyle={{ flex: 1, margin: 10 }}
+            buttonStyle={{ borderColor: 'tomato' }}
+            titleStyle={{ color: 'tomato' }}
+            onPress={() => alert('下書き')}
+          />
+          <Button
+            title="確認する"
+            containerStyle={{ flex: 1, margin: 10 }}
+            buttonStyle={{ backgroundColor: 'tomato' }}
+            onPress={() => alert('確認')}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
