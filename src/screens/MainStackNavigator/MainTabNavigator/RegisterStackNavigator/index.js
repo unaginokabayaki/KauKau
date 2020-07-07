@@ -8,8 +8,14 @@ import {
   Dimensions,
   TextInput,
   FlatList,
+  ActionSheetIOS,
+  Image,
 } from 'react-native';
 import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
+
+import * as ImagePicker from 'expo-image-picker';
+import Constants from 'expo-constants';
+import * as Permissions from 'expo-permissions';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 
@@ -83,12 +89,12 @@ const RegisterScreen = ({ navigation, route }) => {
 
   React.useEffect(() => {
     let newdata = [
-      // { image: 'test.png' },
-      // { image: 'test.png' },
-      // { image: 'test.png' },
+      // { uri: 'test.png' },
+      // { uri: 'test.png' },
+      // { uri: 'test.png' },
     ];
     setData(newdata);
-    setParentWidth(childrenWidth * newdata.length);
+    setParentWidth(imageFlameWidth(newdata));
   }, []);
 
   React.useEffect(() => {
@@ -109,12 +115,78 @@ const RegisterScreen = ({ navigation, route }) => {
 
   React.useLayoutEffect(() => {}, []);
 
-  const AddImageNew = () => {
-    addData = () => {
+  getPermissionAsync = async () => {
+    if (Constants.platform.ios) {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      // const { status } = await Permissions.getAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        alert('写真にアクセスする権限がありません。');
+        throw 'permission denied';
+      }
+    }
+  };
+
+  pickImage = async () => {
+    try {
+      await getPermissionAsync();
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      console.log(result);
+
+      if (result.cancelled) {
+        throw 'cancelled';
+      }
+
+      return result.uri;
+    } catch (e) {
+      console.log(e);
+      return '';
+    }
+  };
+
+  addImage = (uri) => {
+    let newdata = [...data];
+    newdata.push({ uri: uri });
+    setData(newdata);
+    setParentWidth(imageFlameWidth(newdata));
+  };
+
+  changeImage = async (index) => {
+    const uri = await pickImage();
+    if (uri) {
       let newdata = [...data];
-      newdata.push({ image: 'test.png' });
+      newdata[index] = { uri: uri };
       setData(newdata);
-      setParentWidth(childrenWidth * newdata.length);
+      setParentWidth(imageFlameWidth(newdata));
+    }
+  };
+
+  const AddImageNew = () => {
+    showActionSheet = () => {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['キャンセル', 'アルバムから選択', 'カメラで撮影'],
+          cancelButtonIndex: 0,
+        },
+        async (buttonIndex) => {
+          if (buttonIndex === 0) {
+            return;
+          } else if (buttonIndex === 1) {
+            // addData('logo.png');
+            const uri = await pickImage();
+            if (uri) {
+              addImage(uri);
+            }
+          } else if (buttonIndex === 2) {
+          }
+        }
+      );
     };
 
     return (
@@ -123,7 +195,7 @@ const RegisterScreen = ({ navigation, route }) => {
           ...styles.imageBox,
           backgroundColor: 'tomato',
         }}
-        onPress={addData}
+        onPress={showActionSheet}
       >
         <Icon type="antdesign" name="plus" color="white" size={32} />
       </TouchableOpacity>
@@ -154,14 +226,15 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   renderItem = (item, index) => {
+    console.log(item);
     return (
-      <View
+      <TouchableOpacity
         style={{
           ...styles.imageBox,
         }}
       >
-        {/* <Image></Image> */}
-      </View>
+        <Image source={{ uri: item.uri }} style={{ ...styles.imageBox }} />
+      </TouchableOpacity>
     );
   };
 
@@ -180,9 +253,9 @@ const RegisterScreen = ({ navigation, route }) => {
     return <>{render}</>;
   };
 
-  // imageFlameWidth = () => {
-  //   return childrenWidth * data.length;
-  // };
+  imageFlameWidth = (data) => {
+    return childrenWidth * data.length;
+  };
 
   const SelectedCategory = () => {
     if (category == '') {
@@ -239,6 +312,8 @@ const RegisterScreen = ({ navigation, route }) => {
 
   const DealingFee = () => {
     let ans = convertFromCurrency(price) * 0.05;
+    ans = Math.floor(ans);
+
     return (
       <View
         style={{
@@ -255,7 +330,7 @@ const RegisterScreen = ({ navigation, route }) => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior="padding"
-      keyboardVerticalOffset={headerHeight + 64}
+      keyboardVerticalOffset={headerHeight}
     >
       <ScrollView>
         <View style={{ height: 110 }}>
@@ -270,7 +345,7 @@ const RegisterScreen = ({ navigation, route }) => {
               {parentWidth >= childrenWidth && (
                 <DragSortableView
                   dataSource={data}
-                  parentWidth={parentWidth}
+                  parentWidth={imageFlameWidth(data)}
                   childrenWidth={childrenWidth}
                   childrenHeight={childrenHeight}
                   marginChildrenTop={marginChildrenTop}
@@ -278,11 +353,9 @@ const RegisterScreen = ({ navigation, route }) => {
                   marginChildrenLeft={marginChildrenLeft}
                   marginChildrenRight={marginChildrenRight}
                   keyExtractor={(item, index) => index.toString()}
-                  renderItem={(item, index) => {
-                    return renderItem(item, index);
-                  }}
+                  renderItem={renderItem}
                   onClickItem={(data, item, index) => {
-                    alert(item.image);
+                    changeImage(index);
                   }}
                   onDataChange={(data) => {}}
                   onDragStart={(startIndex, endIndex) => {

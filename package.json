@@ -26,6 +26,7 @@
     "expo-auth-session": "^1.0.0",
     "expo-font": "~8.1.0",
     "expo-google-app-auth": "^8.1.0",
+    "expo-image-picker": "~8.1.0",
     "expo-web-browser": "~8.1.0",
     "firebase": "7.9.0",
     "native-base": "2.13.8",
