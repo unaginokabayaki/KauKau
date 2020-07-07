@@ -301,12 +301,12 @@ class Firebase {
     try {
       const docRef = await this.item.add({
         image_uri: [],
-        title: '',
-        description: '',
-        category: '',
-        condition_code: 0,
-        item_price: 0,
-        dealing_fee: 0,
+        title: item.title,
+        description: item.description,
+        category: item.category,
+        condition: item.condition,
+        item_price: item.price,
+        // dealing_fee: 0,
         release_date: null,
         status: 0,
         seller: this.fbUid,
@@ -316,7 +316,6 @@ class Firebase {
 
       // this.item.add({ ...item, seller: this.fbUid });
 
-      console.log(docRef);
       return { id: docRef.id };
     } catch (e) {
       console.log(e.message);

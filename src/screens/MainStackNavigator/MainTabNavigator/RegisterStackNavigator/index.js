@@ -71,16 +71,23 @@ const RegisterStackNavigator = () => {
 
 const RegisterScreen = ({ navigation, route }) => {
   let [data, setData] = React.useState([]);
-  // let [numOfImage] = React.useState(10);
+
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
   let [parentWidth, setParentWidth] = React.useState(0);
 
-  let [category, setCategory] = React.useState('');
-  let [condition, setCondition] = React.useState('');
-  let [price, setPrice] = React.useState('');
+  // 入力項目
+  let [form, setForm] = React.useState({
+    title: '',
+    description: '',
+    category: '',
+    condition: '',
+    price: 0,
+  });
+
+  // 表示用（価格）
   let [formattedPrice, setFormattedPrice] = React.useState('');
 
-  let [form, setForm] = React.useState({ title: '', description: '' });
+  // 文字カウンター
   let [wordCounter, setWordCounter] = React.useState({
     title: 0,
     description: 0,
@@ -107,12 +114,19 @@ const RegisterScreen = ({ navigation, route }) => {
   // 選択画面での選択値を受け取って更新
   React.useEffect(() => {
     if (route.params?.category) {
-      setCategory(route.params.category);
+      setForm({ ...form, category: route.params.category });
     }
     if (route.params?.condition) {
-      setCondition(route.params.condition);
+      setForm({ ...form, condition: route.params.condition });
     }
   }, [route.params?.category, route.params?.condition]);
+
+  // フォーマット済み価格が変更されたら、メモリ上で戻す
+  React.useEffect(() => {
+    const price = convertFromCurrency(formattedPrice);
+    // console.log(p);
+    setForm({ ...form, price: price });
+  }, [formattedPrice]);
 
   React.useLayoutEffect(() => {}, []);
 
@@ -259,18 +273,18 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   const SelectedCategory = () => {
-    if (category == '') {
+    if (form.category == '') {
       return <Text style={{ color: 'silver' }}>(任意)</Text>;
     } else {
-      return <Text>{category}</Text>;
+      return <Text>{form.category}</Text>;
     }
   };
 
   const SelectedCondition = () => {
-    if (condition == '') {
+    if (form.condition == '') {
       return <Text style={{ color: 'silver' }}>(必須)</Text>;
     } else {
-      return <Text>{condition}</Text>;
+      return <Text>{form.condition}</Text>;
     }
   };
 
@@ -280,17 +294,16 @@ const RegisterScreen = ({ navigation, route }) => {
         <TextInput
           keyboardType="number-pad"
           placeholder="¥300 ~ ¥1,000,000"
-          value={price}
+          value={formattedPrice}
           onFocus={() => {
-            setPrice(convertFromCurrency(price));
-            // setPrice(price.slice(1));
+            setFormattedPrice(convertFromCurrency(formattedPrice));
           }}
           onChangeText={(text) => {
-            setPrice(text);
+            setFormattedPrice(text);
           }}
           onBlur={() => {
-            if (price != '') {
-              setPrice(convertToCurrency(price));
+            if (formattedPrice != '') {
+              setFormattedPrice(convertToCurrency(formattedPrice));
             }
           }}
           returnKeyType={'done'}
@@ -305,14 +318,14 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   convertFromCurrency = (num) => {
-    let plane = price.replace('¥', '');
-    plane = plane.replace(',', '');
-    plane = plane.replace(' ', '');
-    return plane;
+    let temp = num.replace('¥', '');
+    temp = temp.replace(',', '');
+    temp = temp.replace(' ', '');
+    return temp;
   };
 
   const DealingFee = () => {
-    let ans = convertFromCurrency(price) * 0.05;
+    let ans = form.price * 0.05;
     ans = Math.floor(ans);
 
     return (
@@ -482,7 +495,7 @@ const RegisterScreen = ({ navigation, route }) => {
             buttonStyle={{ borderColor: 'tomato' }}
             titleStyle={{ color: 'tomato' }}
             onPress={() => {
-              firebase.registerItem();
+              firebase.registerItem(form);
               alert('下書き保存しました');
             }}
           />
