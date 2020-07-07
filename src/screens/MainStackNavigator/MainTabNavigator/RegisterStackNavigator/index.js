@@ -26,7 +26,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 
 import { DragSortableView, AutoDragSortableView } from 'react-native-drag-sort';
-import { List } from 'native-base';
+
+import firebase from 'app/src/firebase';
 
 const numOfImage = 5;
 
@@ -480,7 +481,10 @@ const RegisterScreen = ({ navigation, route }) => {
             containerStyle={{ flex: 1, margin: 10 }}
             buttonStyle={{ borderColor: 'tomato' }}
             titleStyle={{ color: 'tomato' }}
-            onPress={() => alert('下書き')}
+            onPress={() => {
+              firebase.registerItem();
+              alert('下書き保存しました');
+            }}
           />
           <Button
             title="確認する"
@@ -530,12 +534,12 @@ const SelectCategoryScreen = ({ navigation, route }) => {
 
 const SelectConditionScreen = ({ navigation, route }) => {
   const list = [
-    { title: '新品・未使用' },
-    { title: '未使用に近い' },
-    { title: '目立った傷や汚れなし' },
-    { title: 'やや傷や汚れあり' },
-    { title: '傷や汚れあり' },
-    { title: '全体的に状態が悪い' },
+    { title: '新品・未使用', id: 1 },
+    { title: '未使用に近い', id: 2 },
+    { title: '目立った傷や汚れなし', id: 3 },
+    { title: 'やや傷や汚れあり', id: 4 },
+    { title: '傷や汚れあり', id: 5 },
+    { title: '全体的に状態が悪い', id: 6 },
   ];
 
   renderItem = ({ item }) => {

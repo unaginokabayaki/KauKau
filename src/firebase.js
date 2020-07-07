@@ -102,6 +102,7 @@ class Firebase {
 
     const db = firebase.firestore();
     this.user = db.collection('user');
+    this.item = db.collection('item');
   }
 
   wait = (ms) => {
@@ -289,6 +290,34 @@ class Firebase {
       // let result = await firebase.auth().signInWithCustomToken(accessToken);
       let result = await firebase.auth().signInWithCredential(credential);
       console.log(result);
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  // アイテム登録
+  registerItem = async (item) => {
+    try {
+      const docRef = await this.item.add({
+        image_uri: [],
+        title: '',
+        description: '',
+        category: '',
+        condition_code: 0,
+        item_price: 0,
+        dealing_fee: 0,
+        release_date: null,
+        status: 0,
+        seller: this.fbUid,
+        buyer: '',
+      });
+      console.log('Document written with ID: ', docRef.id);
+
+      // this.item.add({ ...item, seller: this.fbUid });
+
+      console.log(docRef);
+      return { id: docRef.id };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
