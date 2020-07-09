@@ -16,6 +16,7 @@ import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
+import * as Random from 'expo-random';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 
@@ -155,12 +156,12 @@ const RegisterScreen = ({ navigation, route }) => {
       console.log(result);
 
       if (result.cancelled) {
-        throw 'cancelled';
+        throw Error('cancelled');
       }
 
       return result.uri;
     } catch (e) {
-      console.log(e);
+      console.log(e.message);
       return '';
     }
   };
@@ -241,7 +242,6 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   renderItem = (item, index) => {
-    console.log(item);
     return (
       <TouchableOpacity
         style={{
@@ -494,16 +494,20 @@ const RegisterScreen = ({ navigation, route }) => {
             containerStyle={{ flex: 1, margin: 10 }}
             buttonStyle={{ borderColor: 'tomato' }}
             titleStyle={{ color: 'tomato' }}
-            onPress={() => {
-              firebase.registerItem(form);
-              alert('下書き保存しました');
+            onPress={async () => {
+              const { error } = await firebase.registerItem(form, data);
+              if (!error) {
+                alert('下書き保存しました');
+              } else {
+                alert('保存に失敗しました');
+              }
             }}
           />
           <Button
             title="確認する"
             containerStyle={{ flex: 1, margin: 10 }}
             buttonStyle={{ backgroundColor: 'tomato' }}
-            onPress={() => alert('確認')}
+            onPress={() => firebase.uploadFile('test', data[0].uri)}
           />
         </View>
       </ScrollView>

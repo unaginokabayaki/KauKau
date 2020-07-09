@@ -23,6 +23,7 @@ import {
 import * as Google from 'expo-google-app-auth';
 import * as AppAuth from 'expo-app-auth';
 import * as AuthSession from 'expo-auth-session';
+import * as Random from 'expo-random';
 
 const firebaseConfig = {
   apiKey,
@@ -296,11 +297,36 @@ class Firebase {
     }
   };
 
+  saveImages = async (itemId, images) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let paths = [];
+        for (let item of images) {
+          let uploadedPath = await this.uploadFile(itemId, item.uri);
+          console.log('new file is uploaded');
+          paths.push(uploadedPath);
+        }
+        resolve(paths);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+
   // アイテム登録
-  registerItem = async (item) => {
+  registerItem = async (item, images) => {
     try {
-      const docRef = await this.item.add({
-        image_uri: [],
+      // id発行
+      const docRef = await this.item.add({});
+      console.log(`new item is created: ${docRef.id}`);
+
+      // 画像アップロード
+      const imageUploadedPath = await this.saveImages(docRef.id, images);
+      // console.log(imageUploadedPath);
+
+      // 画像パス更新
+      const docUplRef = await this.item.doc(`${docRef.id}`).update({
+        image_uri: imageUploadedPath,
         title: item.title,
         description: item.description,
         category: item.category,
@@ -312,14 +338,70 @@ class Firebase {
         seller: this.fbUid,
         buyer: '',
       });
-      console.log('Document written with ID: ', docRef.id);
-
-      // this.item.add({ ...item, seller: this.fbUid });
+      console.log('file path is saved');
 
       return { id: docRef.id };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
+    }
+  };
+
+  newFileName = async () => {
+    let randomBytes = await Random.getRandomBytesAsync(32);
+    return randomBytes.reduce((a, c) => a + (c % 32).toString(32));
+  };
+
+  uploadFile = async (itemId, uri) => {
+    try {
+      const ext = uri.split('.').slice(-1)[0];
+      const filename = await this.newFileName();
+      const path = `item/${itemId}/${filename}.${ext}`;
+      console.log(`Upload to: ${path}`);
+
+      let storageRef = firebase.storage().ref().child(path);
+      const blob = await fetch(uri).then((response) => response.blob());
+      // const metadata = { contentType: 'image/jpeg' };
+
+      return new Promise(async (resolve, reject) => {
+        let uploadTask = storageRef.put(blob);
+        const unsbscribe = uploadTask.on(
+          firebase.storage.TaskEvent.STATE_CHANGED,
+          // next
+          (snapshot) => {
+            let progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            progress = Math.floor(progress);
+            console.log(`Upload is ${progress}% done`);
+            switch (snapshot.state) {
+              case firebase.storage.TaskState.PAUSED: // or 'paused'
+                console.log('Upload is paused');
+                break;
+              case firebase.storage.TaskState.RUNNING: // or 'running'
+                console.log('Upload is running');
+                break;
+              default:
+                break;
+            }
+          },
+          // error
+          (err) => {
+            console.log(err);
+            unsbscribe();
+            reject(err);
+          },
+          // complete
+          async () => {
+            unsbscribe();
+            const url = await uploadTask.snapshot.ref.getDownloadURL();
+            console.log(url);
+            // return url;
+            resolve(url);
+          }
+        );
+      });
+    } catch (e) {
+      console.log(e.message);
     }
   };
 }
