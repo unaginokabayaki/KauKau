@@ -1,11 +1,12 @@
 import React from 'react';
-import { Text, View, Button, TouchableOpacity } from 'react-native';
+import { Text, View, Button, TouchableOpacity, ScrollView } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 import DrawerButton from 'app/src/common/DrawerButton';
+import HomeStackNavigator from 'app/src/screens/MainStackNavigator/MainTabNavigator/HomeStackNavigator';
 import RegisterStackNavigator from 'app/src/screens/MainStackNavigator/MainTabNavigator/RegisterStackNavigator';
 
 import styles from './styles';
@@ -46,47 +47,6 @@ const MainTabNavigator = ({ navigation }) => {
     </MainTab.Navigator>
   );
 };
-
-const HomeStack = createStackNavigator();
-const HomeStackNavigator = () => {
-  return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={({ navigation }) => ({
-          headerLeft: () => <DrawerButton navigation={navigation} />,
-        })}
-      />
-      <HomeStack.Screen name="Item" component={ItemScreen} />
-    </HomeStack.Navigator>
-  );
-};
-
-const HomeScreen = ({ navigation }) => {
-  let context = StateContainer.useContainer();
-
-  return (
-    <View style={styles.container}>
-      <Text>HomeScreen</Text>
-      <Button title="Item" onPress={() => navigation.navigate('Item')}></Button>
-      <Button
-        title="Register"
-        onPress={() => navigation.navigate('Register')}
-      ></Button>
-      <Button title="Help" onPress={() => navigation.navigate('Help')}></Button>
-    </View>
-  );
-};
-
-const ItemScreen = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <Text>ItemScreen</Text>
-    </View>
-  );
-};
-
 
 const NotificationStack = createStackNavigator();
 const NotificationStackNavigator = () => {
