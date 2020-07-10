@@ -314,18 +314,19 @@ class Firebase {
   };
 
   // アイテム登録
-  registerItem = async (item, images) => {
+  registerItem = async (item, images, status) => {
     try {
       // id発行
-      const docRef = await this.item.add({});
+      const docRef = await this.item.add({
+        created_time: firebase.firestore.FieldValue.serverTimestamp(),
+      });
       console.log(`new item is created: ${docRef.id}`);
 
       // 画像アップロード
       const imageUploadedPath = await this.saveImages(docRef.id, images);
       // console.log(imageUploadedPath);
 
-      // 画像パス更新
-      const docUplRef = await this.item.doc(`${docRef.id}`).update({
+      let data = {
         image_uri: imageUploadedPath,
         title: item.title,
         description: item.description,
@@ -334,10 +335,14 @@ class Firebase {
         item_price: item.price,
         // dealing_fee: 0,
         release_date: null,
-        status: 0,
+        status: status,
         seller: this.fbUid,
         buyer: '',
-      });
+        updated_time: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // 画像パス更新
+      const docUplRef = await this.item.doc(`${docRef.id}`).update(data);
       console.log('file path is saved');
 
       return { id: docRef.id };

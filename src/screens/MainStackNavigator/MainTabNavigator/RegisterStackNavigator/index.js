@@ -27,6 +27,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 
 import { DragSortableView, AutoDragSortableView } from 'react-native-drag-sort';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import firebase from 'app/src/firebase';
 
@@ -75,6 +76,7 @@ const RegisterScreen = ({ navigation, route }) => {
 
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
   let [parentWidth, setParentWidth] = React.useState(0);
+  let [spinner, setSpinner] = React.useState(false);
 
   // 入力項目
   let [form, setForm] = React.useState({
@@ -340,12 +342,25 @@ const RegisterScreen = ({ navigation, route }) => {
     );
   };
 
+  const validateInput = () => {
+    if (data.length == 0) {
+      alert('画像を選択してください');
+      return false;
+    }
+    return true;
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior="padding"
       keyboardVerticalOffset={headerHeight}
     >
+      <Spinner
+        visible={spinner}
+        textContent={'送信中...'}
+        textStyle={{ color: 'white' }}
+      />
       <ScrollView>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
@@ -495,19 +510,46 @@ const RegisterScreen = ({ navigation, route }) => {
             buttonStyle={{ borderColor: 'tomato' }}
             titleStyle={{ color: 'tomato' }}
             onPress={async () => {
-              const { error } = await firebase.registerItem(form, data);
-              if (!error) {
-                alert('下書き保存しました');
-              } else {
-                alert('保存に失敗しました');
+              if (!validateInput()) {
+                return;
               }
+
+              setSpinner(true);
+              const { error } = await firebase.registerItem(form, data, 0);
+              setSpinner(false);
+
+              // スピナー終了直後は少し間を空けないとうまく行かない
+              setTimeout(() => {
+                if (!error) {
+                  alert('下書き保存しました');
+                } else {
+                  alert('エラーが発生しました');
+                }
+              }, 100);
             }}
           />
           <Button
             title="確認する"
             containerStyle={{ flex: 1, margin: 10 }}
             buttonStyle={{ backgroundColor: 'tomato' }}
-            onPress={() => firebase.uploadFile('test', data[0].uri)}
+            onPress={async () => {
+              if (!validateInput()) {
+                return;
+              }
+
+              setSpinner(true);
+              const { error } = await firebase.registerItem(form, data, 1);
+              setSpinner(false);
+
+              // スピナー終了直後は少し間を空けないとうまく行かない
+              setTimeout(() => {
+                if (!error) {
+                  alert('出品が完了しました');
+                } else {
+                  alert('エラーが発生しました');
+                }
+              }, 100);
+            }}
           />
         </View>
       </ScrollView>
