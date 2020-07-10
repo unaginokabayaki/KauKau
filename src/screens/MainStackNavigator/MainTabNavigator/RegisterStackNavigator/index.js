@@ -72,7 +72,7 @@ const RegisterStackNavigator = () => {
 };
 
 const RegisterScreen = ({ navigation, route }) => {
-  let [data, setData] = React.useState([]);
+  let [images, setImages] = React.useState([]);
 
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
   let [parentWidth, setParentWidth] = React.useState(0);
@@ -99,13 +99,13 @@ const RegisterScreen = ({ navigation, route }) => {
   const headerHeight = useHeaderHeight();
 
   React.useEffect(() => {
-    let newdata = [
+    let newImages = [
       // { uri: 'test.png' },
       // { uri: 'test.png' },
       // { uri: 'test.png' },
     ];
-    setData(newdata);
-    setParentWidth(imageFlameWidth(newdata));
+    setImages(newImages);
+    setParentWidth(imageFlameWidth(newImages));
   }, []);
 
   React.useEffect(() => {
@@ -169,18 +169,18 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   addImage = (uri) => {
-    let newdata = [...data];
-    newdata.push({ uri: uri });
-    setData(newdata);
-    setParentWidth(imageFlameWidth(newdata));
+    let newImages = [...images];
+    newImages.push({ uri: uri });
+    setImages(newImages);
+    setParentWidth(imageFlameWidth(newImages));
   };
 
   changeImage = async (index) => {
     const uri = await pickImage();
     if (uri) {
-      let newdata = [...data];
+      let newdata = [...images];
       newdata[index] = { uri: uri };
-      setData(newdata);
+      setImages(newdata);
       setParentWidth(imageFlameWidth(newdata));
     }
   };
@@ -196,12 +196,13 @@ const RegisterScreen = ({ navigation, route }) => {
           if (buttonIndex === 0) {
             return;
           } else if (buttonIndex === 1) {
-            // addData('logo.png');
+            // pick new image
             const uri = await pickImage();
             if (uri) {
               addImage(uri);
             }
           } else if (buttonIndex === 2) {
+            // change image
           }
         }
       );
@@ -256,12 +257,12 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   renderEmptyBox = () => {
-    let count = numOfImage - data.length;
+    let count = numOfImage - images.length;
 
     let render = [];
     for (let i = 0; i < count; i++) {
       if (i == 0) {
-        render.push(<AddImageNew key={i.toString()} data={data} />);
+        render.push(<AddImageNew key={i.toString()} />);
       } else {
         render.push(<AddImageEmpty key={i.toString()} />);
       }
@@ -270,8 +271,8 @@ const RegisterScreen = ({ navigation, route }) => {
     return <>{render}</>;
   };
 
-  imageFlameWidth = (data) => {
-    return childrenWidth * data.length;
+  imageFlameWidth = (images) => {
+    return childrenWidth * images.length;
   };
 
   const SelectedCategory = () => {
@@ -343,8 +344,16 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   const validateInput = () => {
-    if (data.length == 0) {
+    if (images.length == 0) {
       alert('画像を選択してください');
+      return false;
+    }
+    if (form.title == '') {
+      alert('タイトルを入力してください');
+      return false;
+    }
+    if (form.price == 0) {
+      alert('価格を入力してください');
       return false;
     }
     return true;
@@ -373,8 +382,8 @@ const RegisterScreen = ({ navigation, route }) => {
             >
               {parentWidth >= childrenWidth && (
                 <DragSortableView
-                  dataSource={data}
-                  parentWidth={imageFlameWidth(data)}
+                  dataSource={images}
+                  parentWidth={imageFlameWidth(images)}
                   childrenWidth={childrenWidth}
                   childrenHeight={childrenHeight}
                   marginChildrenTop={marginChildrenTop}
@@ -515,7 +524,7 @@ const RegisterScreen = ({ navigation, route }) => {
               }
 
               setSpinner(true);
-              const { error } = await firebase.registerItem(form, data, 0);
+              const { error } = await firebase.registerItem(form, images, 0);
               setSpinner(false);
 
               // スピナー終了直後は少し間を空けないとうまく行かない
@@ -538,7 +547,7 @@ const RegisterScreen = ({ navigation, route }) => {
               }
 
               setSpinner(true);
-              const { error } = await firebase.registerItem(form, data, 1);
+              const { error } = await firebase.registerItem(form, images, 1);
               setSpinner(false);
 
               // スピナー終了直後は少し間を空けないとうまく行かない
