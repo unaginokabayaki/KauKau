@@ -409,6 +409,25 @@ class Firebase {
       console.log(e.message);
     }
   };
+
+  getItems = async () => {
+    try {
+      let ref = this.item.orderBy('created_time', 'desc');
+
+      const snapshot = await ref.get();
+
+      // map中でPromiseを使う場合はPromise.allで囲ってawaitする
+      const data = snapshot.docs.map((doc) => {
+        const data = { id: doc.id, ...doc.data() };
+        return data;
+      });
+
+      return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
 }
 
 export default new Firebase(firebaseConfig);

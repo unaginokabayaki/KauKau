@@ -11,12 +11,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
-import DrawerButton from 'app/src/common/DrawerButton';
+import { Image } from 'react-native-elements';
 
+import DrawerButton from 'app/src/common/DrawerButton';
+import firebase from 'app/src/firebase';
 import styles from './styles';
 
 const Window = Dimensions.get('window');
-const itemWidth = (Window.width - 10) / 3;
+const numColumns = 1;
+const itemWidth = (Window.width - 10) / numColumns;
 
 const HomeStack = createStackNavigator();
 const HomeStackNavigator = () => {
@@ -43,8 +46,14 @@ const HomeScreen = ({ navigation }) => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setItemList([1, 2, 3, 4, 5]);
+  const loadData = async () => {
+    let { data } = await firebase.getItems();
+    console.log(data);
+    setItemList(data);
+  };
+
+  convertToCurrency = (num) => {
+    return '¥' + num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
 
   renderItem = ({ item, index, separators }) => {
@@ -53,15 +62,33 @@ const HomeScreen = ({ navigation }) => {
         style={{
           width: itemWidth,
           height: itemWidth,
-          borderWidth: 1,
-          padding: 5,
+          padding: 2,
         }}
         onPress={() => navigation.navigate('Item')}
       >
-        <Text>image</Text>
-        <Text>title</Text>
-        <Text>price</Text>
-        <Text>like</Text>
+        <Image
+          source={{ uri: item.image_uri[0] }}
+          style={{
+            width: itemWidth - 4,
+            height: itemWidth - 4,
+            borderRadius: 4,
+            resizeMode: 'contain',
+          }}
+        >
+          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '600',
+                alignSelf: 'flex-start',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                padding: 4,
+              }}
+            >
+              {convertToCurrency(item.item_price || 0)}
+            </Text>
+          </View>
+        </Image>
       </TouchableOpacity>
     );
   };
@@ -71,8 +98,8 @@ const HomeScreen = ({ navigation }) => {
       <FlatList
         data={itemList}
         renderItem={renderItem}
-        numColumns={3}
-        keyExtractor={(item) => item.toString()}
+        numColumns={numColumns}
+        keyExtractor={(item) => item.id}
       ></FlatList>
     </View>
   );
