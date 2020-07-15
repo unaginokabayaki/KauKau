@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   FlatList,
   Dimensions,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
@@ -41,10 +43,13 @@ const HomeScreen = ({ navigation }) => {
   let context = StateContainer.useContainer();
   const [itemList, setItemList] = React.useState([]);
   const [cursor, setCursor] = React.useState(null);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   React.useEffect(() => {
     // 初回ロード
-    loadData();
+    (async () => {
+      await loadData();
+    })();
   }, []);
 
   const loadData = async (cursor = null) => {
@@ -52,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
     if (!res.error) {
       console.log(res.data.length);
       if (res.cursor) {
-        setItemList(itemList.concat(res.data));
+        setItemList(cursor ? itemList.concat(res.data) : res.data);
         setCursor(res.cursor);
       }
     }
@@ -62,10 +67,10 @@ const HomeScreen = ({ navigation }) => {
     return '¥' + num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
 
-  onEndReached = () => {
+  onEndReached = async () => {
     // 最後尾を表示したら次のデータロード
     console.log('this is the end');
-    loadData(cursor);
+    await loadData(cursor);
   };
 
   renderItem = ({ item, index, separators }) => {
@@ -105,6 +110,12 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  const wait = (timeout) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, timeout);
+    });
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -112,8 +123,14 @@ const HomeScreen = ({ navigation }) => {
         renderItem={renderItem}
         numColumns={numColumns}
         keyExtractor={(item) => item.id}
-        onEndReachedThreshold={0.2}
+        onEndReachedThreshold={0}
         onEndReached={onEndReached}
+        refreshing={refreshing}
+        onRefresh={async () => {
+          setRefreshing(true);
+          await loadData();
+          setRefreshing(false);
+        }}
       ></FlatList>
     </View>
   );
