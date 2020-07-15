@@ -40,20 +40,32 @@ const HomeStackNavigator = () => {
 const HomeScreen = ({ navigation }) => {
   let context = StateContainer.useContainer();
   const [itemList, setItemList] = React.useState([]);
+  const [cursor, setCursor] = React.useState(null);
 
   React.useEffect(() => {
-    //ロード処理
+    // 初回ロード
     loadData();
   }, []);
 
-  const loadData = async () => {
-    let { data } = await firebase.getItems();
-    console.log(data);
-    setItemList(data);
+  const loadData = async (cursor = null) => {
+    let res = await firebase.getItems(cursor);
+    if (!res.error) {
+      console.log(res.data.length);
+      if (res.cursor) {
+        setItemList(itemList.concat(res.data));
+        setCursor(res.cursor);
+      }
+    }
   };
 
   convertToCurrency = (num) => {
     return '¥' + num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+  };
+
+  onEndReached = () => {
+    // 最後尾を表示したら次のデータロード
+    console.log('this is the end');
+    loadData(cursor);
   };
 
   renderItem = ({ item, index, separators }) => {
@@ -100,6 +112,8 @@ const HomeScreen = ({ navigation }) => {
         renderItem={renderItem}
         numColumns={numColumns}
         keyExtractor={(item) => item.id}
+        onEndReachedThreshold={0.2}
+        onEndReached={onEndReached}
       ></FlatList>
     </View>
   );

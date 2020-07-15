@@ -410,9 +410,14 @@ class Firebase {
     }
   };
 
-  getItems = async () => {
+  getItems = async (cursor = null, num = 3) => {
     try {
-      let ref = this.item.orderBy('created_time', 'desc');
+      let ref = this.item.orderBy('created_time', 'desc').limit(num);
+
+      // 最後尾の次のデータから始める
+      if (cursor) {
+        ref = ref.startAfter(cursor);
+      }
 
       const snapshot = await ref.get();
 
@@ -422,7 +427,11 @@ class Firebase {
         return data;
       });
 
-      return { data };
+      // 最後尾のデータを返す(全部出した場合はnull)
+      const datalen = snapshot.docs.length;
+      const currentCursor = datalen > 0 ? snapshot.docs[datalen - 1] : null;
+
+      return { data, cursor: currentCursor };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
