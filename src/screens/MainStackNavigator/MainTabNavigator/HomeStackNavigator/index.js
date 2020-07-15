@@ -48,9 +48,9 @@ const HomeScreen = ({ navigation }) => {
 
   React.useEffect(() => {
     // 初回ロード
-    (async () => {
-      await loadData();
-    })();
+    // (async () => {
+    //   await loadData();
+    // })();
   }, []);
 
   const loadData = async (cursor = null) => {
@@ -140,6 +140,13 @@ const HomeScreen = ({ navigation }) => {
               <ActivityIndicator size="small" />
             </View>
           ) : null
+        }
+        ListEmptyComponent={
+          <View>
+            <Text style={{ fontSize: 16, padding: 32 }}>
+              該当するアイテムがありません
+            </Text>
+          </View>
         }
       ></FlatList>
     </View>

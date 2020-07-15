@@ -13,4 +13,8 @@ export default styles = StyleSheet.create({
     alignItems: 'center',
     padding: 4,
   },
+  empty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
