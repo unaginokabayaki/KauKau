@@ -44,6 +44,7 @@ const HomeScreen = ({ navigation }) => {
   const [itemList, setItemList] = React.useState([]);
   const [cursor, setCursor] = React.useState(null);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     // 初回ロード
@@ -53,6 +54,7 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   const loadData = async (cursor = null) => {
+    setLoading(true);
     let res = await firebase.getItems(cursor);
     if (!res.error) {
       console.log(res.data.length);
@@ -61,6 +63,7 @@ const HomeScreen = ({ navigation }) => {
         setCursor(res.cursor);
       }
     }
+    setLoading(false);
   };
 
   convertToCurrency = (num) => {
@@ -131,6 +134,13 @@ const HomeScreen = ({ navigation }) => {
           await loadData();
           setRefreshing(false);
         }}
+        ListFooterComponent={
+          loading ? (
+            <View style={styles.loading}>
+              <ActivityIndicator size="small" />
+            </View>
+          ) : null
+        }
       ></FlatList>
     </View>
   );

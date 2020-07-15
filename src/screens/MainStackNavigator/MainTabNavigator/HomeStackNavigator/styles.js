@@ -8,4 +8,9 @@ export default styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  loading: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 4,
+  },
 });
