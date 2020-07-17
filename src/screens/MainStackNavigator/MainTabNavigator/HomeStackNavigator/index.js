@@ -2,18 +2,18 @@ import React from 'react';
 import {
   Text,
   View,
-  Button,
   TouchableOpacity,
   FlatList,
   Dimensions,
   RefreshControl,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Image } from 'react-native-elements';
+import { Image, ListItem, Button } from 'react-native-elements';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import firebase from 'app/src/firebase';
@@ -48,9 +48,9 @@ const HomeScreen = ({ navigation }) => {
 
   React.useEffect(() => {
     // 初回ロード
-    // (async () => {
-    //   await loadData();
-    // })();
+    (async () => {
+      await loadData();
+    })();
   }, []);
 
   const loadData = async (cursor = null) => {
@@ -84,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
           height: itemWidth,
           padding: 2,
         }}
-        onPress={() => navigation.navigate('Item')}
+        onPress={() => navigation.navigate('Item', { itemId: item.id })}
       >
         <Image
           source={{ uri: item.image_uri[0] }}
@@ -111,12 +111,6 @@ const HomeScreen = ({ navigation }) => {
         </Image>
       </TouchableOpacity>
     );
-  };
-
-  const wait = (timeout) => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, timeout);
-    });
   };
 
   return (
@@ -153,12 +147,105 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const ItemScreen = ({ navigation }) => {
+const ItemScreen = ({ route, navigation }) => {
+  const { itemId } = route.params;
+  const [item, setItem] = React.useState({});
+
+  React.useEffect(() => {
+    (async () => {
+      let res = await firebase.getItem(itemId);
+      if (!res.error) {
+        // console.log(res.data);
+        setItem(res.data);
+      }
+    })();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>ItemScreen</Text>
+    <View style={{ justifyContent: 'flex-end' }}>
+      <ScrollView>
+        <View style={{ backgroundColor: 'white' }}>
+          <Image
+            source={{ uri: item.image_uri?.[0] }}
+            style={{
+              height: Window.width,
+              width: Window.width,
+              borderRadius: 4,
+              resizeMode: 'contain',
+            }}
+          />
+          <View style={{ height: 60, margin: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: '500', paddingTop: 6 }}>
+              {item.title}
+            </Text>
+          </View>
+        </View>
+        <View style={{ height: 200 }}>
+          <Text>商品情報</Text>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <View style={{ flex: 1, marginHorizontal: 10 }}>
+              <Text style={{ marginVertical: 10 }}>{item.description}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={{ height: 10 }}></View>
+        <View style={{ height: 120 }}>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <ListItem
+              title="カテゴリ"
+              bottomDivider
+              rightElement={<Text>{item.category}</Text>}
+            />
+            <ListItem
+              title="状態"
+              bottomDivider
+              rightElement={<Text>{item.condition}</Text>}
+            />
+          </View>
+        </View>
+        <View style={{ height: 120 }}>
+          <Text>出品者</Text>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <ListItem
+              title="出品者"
+              bottomDivider
+              rightElement={<Text>{item.id}</Text>}
+            />
+          </View>
+        </View>
+      </ScrollView>
+      <View
+        style={{
+          height: 50,
+          flexDirection: 'row',
+          backgroundColor: '#491313',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}
+      >
+        <View>
+          <Text style={{ color: 'white', fontSize: 10, fontWeight: '500' }}>
+            {'送料込み'}
+          </Text>
+          <Text style={{ color: 'white', fontSize: 22, fontWeight: '600' }}>
+            {convertToCurrency(item.item_price || 0)}
+          </Text>
+        </View>
+        <Button
+          title="購入手続きへ"
+          buttonStyle={{ backgroundColor: '#E8392E' }}
+          titleStyle={{ fontSize: 14, fontWeight: '500' }}
+        />
+      </View>
     </View>
   );
+};
+
+const wait = (timeout) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
 };
 
 export default HomeStackNavigator;

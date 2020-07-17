@@ -437,6 +437,22 @@ class Firebase {
       return { error: e.message };
     }
   };
+
+  getItem = async (id) => {
+    try {
+      let doc = await this.item.doc(id).get();
+      if (!doc.exists) {
+        throw Error('No such document');
+      }
+
+      let data = { id, ...doc.data() };
+
+      return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
 }
 
 export default new Firebase(firebaseConfig);
