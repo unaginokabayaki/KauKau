@@ -14,6 +14,7 @@ import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Image, ListItem, Button } from 'react-native-elements';
+import Swiper from 'react-native-swiper';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import firebase from 'app/src/firebase';
@@ -151,6 +152,9 @@ const ItemScreen = ({ route, navigation }) => {
   const { itemId } = route.params;
   const [item, setItem] = React.useState({});
 
+  const [imageIndexShown, setImageIndexShown] = React.useState(0);
+  const imageScrollViewRef = React.useRef(null);
+
   React.useEffect(() => {
     (async () => {
       let res = await firebase.getItem(itemId);
@@ -161,23 +165,115 @@ const ItemScreen = ({ route, navigation }) => {
     })();
   }, []);
 
+  const showNextImage = (direction) => {
+    const nextIndex = imageIndexShown + direction;
+    if (nextIndex > item.image_uri.length - 1) {
+      return;
+    }
+    if (nextIndex < 0) {
+      return;
+    }
+
+    imageScrollViewRef?.current?.scrollTo({
+      x: Window.width * nextIndex,
+      y: 0,
+      animated: true,
+    });
+
+    setImageIndexShown(nextIndex);
+  };
+
   return (
     <View style={{ justifyContent: 'flex-end' }}>
       <ScrollView>
         <View style={{ backgroundColor: 'white' }}>
-          <Image
-            source={{ uri: item.image_uri?.[0] }}
+          <ScrollView
+            ref={imageScrollViewRef}
+            horizontal
+            pagingEnabled
             style={{
               height: Window.width,
-              width: Window.width,
-              borderRadius: 4,
-              resizeMode: 'contain',
             }}
-          />
-          <View style={{ height: 60, margin: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: '500', paddingTop: 6 }}>
+          >
+            {item.image_uri?.map((v, i) => {
+              return (
+                <Image
+                  source={{ uri: item.image_uri?.[i] }}
+                  style={{
+                    height: Window.width,
+                    width: Window.width,
+                    resizeMode: 'contain',
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: 10,
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={styles.imageControlButton}
+                      onPress={() => {
+                        showNextImage(-1);
+                      }}
+                    >
+                      <Text style={styles.imageControlButtonText}>{'<'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.imageControlButton}
+                      onPress={() => {
+                        showNextImage(1);
+                      }}
+                    >
+                      <Text style={styles.imageControlButtonText}>{'>'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </Image>
+              );
+            })}
+          </ScrollView>
+
+          <View style={{ margin: 10 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '500',
+                paddingTop: 6,
+              }}
+            >
               {item.title}
+              {
+                'describes how to shrink children along the main axis in the case in which the total'
+              }
             </Text>
+
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <View style={{ flexDirection: 'row' }}>
+                <Button
+                  title="いいね"
+                  buttonStyle={styles.roundButtonStyle}
+                  titleStyle={styles.roundButtonTitleStyle}
+                  containerStyle={styles.roundButtonContainer}
+                />
+                <Button
+                  title="コメント"
+                  buttonStyle={styles.roundButtonStyle}
+                  titleStyle={styles.roundButtonTitleStyle}
+                  containerStyle={styles.roundButtonContainer}
+                />
+              </View>
+              <Button
+                title="＞"
+                buttonStyle={styles.roundButtonStyle}
+                titleStyle={styles.roundButtonTitleStyle}
+                containerStyle={[styles.roundButtonContainer]}
+              />
+            </View>
           </View>
         </View>
         <View style={{ height: 200 }}>
