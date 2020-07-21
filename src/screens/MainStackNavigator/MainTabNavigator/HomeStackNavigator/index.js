@@ -14,7 +14,6 @@ import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Image, ListItem, Button } from 'react-native-elements';
-import Swiper from 'react-native-swiper';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import firebase from 'app/src/firebase';
@@ -198,6 +197,7 @@ const ItemScreen = ({ route, navigation }) => {
             {item.image_uri?.map((v, i) => {
               return (
                 <Image
+                  key={i.toString()}
                   source={{ uri: item.image_uri?.[i] }}
                   style={{
                     height: Window.width,
@@ -206,16 +206,23 @@ const ItemScreen = ({ route, navigation }) => {
                   }}
                 >
                   <View
+                    key={i.toString()}
                     style={{
                       flex: 1,
                       flexDirection: 'row',
-                      justifyContent: 'space-between',
+                      justifyContent:
+                        imageIndexShown == 0 ? 'flex-end' : 'space-between',
                       alignItems: 'center',
-                      padding: 10,
+                      padding: 4,
                     }}
                   >
                     <TouchableOpacity
-                      style={styles.imageControlButton}
+                      style={[
+                        styles.imageControlButton,
+                        {
+                          display: imageIndexShown == 0 ? 'none' : 'flex',
+                        },
+                      ]}
                       onPress={() => {
                         showNextImage(-1);
                       }}
@@ -223,7 +230,15 @@ const ItemScreen = ({ route, navigation }) => {
                       <Text style={styles.imageControlButtonText}>{'<'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={styles.imageControlButton}
+                      style={[
+                        styles.imageControlButton,
+                        {
+                          display:
+                            imageIndexShown == item.image_uri?.length - 1
+                              ? 'none'
+                              : 'flex',
+                        },
+                      ]}
                       onPress={() => {
                         showNextImage(1);
                       }}

@@ -28,9 +28,9 @@ export default styles = StyleSheet.create({
   roundButtonContainer: { marginTop: 6 },
   imageControlButton: {
     backgroundColor: 'rgba(0,0,0,0.5)',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
