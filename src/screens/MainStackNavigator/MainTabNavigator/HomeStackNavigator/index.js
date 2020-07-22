@@ -14,6 +14,7 @@ import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Image, ListItem, Button } from 'react-native-elements';
+import Swiper from 'react-native-swiper';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import firebase from 'app/src/firebase';
@@ -151,9 +152,6 @@ const ItemScreen = ({ route, navigation }) => {
   const { itemId } = route.params;
   const [item, setItem] = React.useState({});
 
-  const [imageIndexShown, setImageIndexShown] = React.useState(0);
-  const imageScrollViewRef = React.useRef(null);
-
   React.useEffect(() => {
     (async () => {
       let res = await firebase.getItem(itemId);
@@ -164,92 +162,56 @@ const ItemScreen = ({ route, navigation }) => {
     })();
   }, []);
 
-  const showNextImage = (direction) => {
-    const nextIndex = imageIndexShown + direction;
-    if (nextIndex > item.image_uri.length - 1) {
-      return;
-    }
-    if (nextIndex < 0) {
-      return;
-    }
-
-    imageScrollViewRef?.current?.scrollTo({
-      x: Window.width * nextIndex,
-      y: 0,
-      animated: true,
-    });
-
-    setImageIndexShown(nextIndex);
-  };
-
   return (
     <View style={{ justifyContent: 'flex-end' }}>
       <ScrollView>
         <View style={{ backgroundColor: 'white' }}>
-          <ScrollView
-            ref={imageScrollViewRef}
-            horizontal
-            pagingEnabled
+          <View
             style={{
-              height: Window.width,
+              flex: 1,
+              justifyContent: 'center',
             }}
           >
-            {item.image_uri?.map((v, i) => {
-              return (
-                <Image
-                  key={i.toString()}
-                  source={{ uri: item.image_uri?.[i] }}
-                  style={{
-                    height: Window.width,
-                    width: Window.width,
-                    resizeMode: 'contain',
-                  }}
-                >
-                  <View
-                    key={i.toString()}
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      justifyContent:
-                        imageIndexShown == 0 ? 'flex-end' : 'space-between',
-                      alignItems: 'center',
-                      padding: 4,
-                    }}
+            {item.image_uri && (
+              <Swiper
+                style={{
+                  height: Window.width,
+                }}
+                loop={false}
+                showsButtons={true}
+                dotColor="rgba(255,255,255,0.2)"
+                activeDotColor="rgba(255,255,255,0.8)"
+                nextButton={
+                  <Text
+                    style={{ color: 'rgba(255,255,255,0.8)', fontSize: 48 }}
                   >
-                    <TouchableOpacity
-                      style={[
-                        styles.imageControlButton,
-                        {
-                          display: imageIndexShown == 0 ? 'none' : 'flex',
-                        },
-                      ]}
-                      onPress={() => {
-                        showNextImage(-1);
+                    ›
+                  </Text>
+                }
+                prevButton={
+                  <Text
+                    style={{ color: 'rgba(255,255,255,0.8)', fontSize: 48 }}
+                  >
+                    ‹
+                  </Text>
+                }
+              >
+                {item.image_uri?.map((v, i) => {
+                  return (
+                    <Image
+                      key={i.toString()}
+                      source={{ uri: item.image_uri?.[i] }}
+                      style={{
+                        height: Window.width,
+                        width: Window.width,
+                        resizeMode: 'contain',
                       }}
-                    >
-                      <Text style={styles.imageControlButtonText}>{'<'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.imageControlButton,
-                        {
-                          display:
-                            imageIndexShown == item.image_uri?.length - 1
-                              ? 'none'
-                              : 'flex',
-                        },
-                      ]}
-                      onPress={() => {
-                        showNextImage(1);
-                      }}
-                    >
-                      <Text style={styles.imageControlButtonText}>{'>'}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </Image>
-              );
-            })}
-          </ScrollView>
+                    ></Image>
+                  );
+                })}
+              </Swiper>
+            )}
+          </View>
 
           <View style={{ margin: 10 }}>
             <Text
