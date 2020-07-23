@@ -23,7 +23,7 @@ export default function App() {
   loadResource = async () => {
     console.log('begin loadResource');
     // await wait(2000);
-    let user = await firebase.checkLoginUser();
+    let { user } = await firebase.checkLoginUser();
     console.log('end loadResource');
     return;
   };

@@ -3,9 +3,13 @@ import { createContainer } from 'unstated-next';
 
 export function useStore(initialState = 0) {
   let [isLogin, setLogin] = React.useState(false);
-  let login = () => setLogin(true);
+  let [user, setUser] = React.useState({});
+  let login = (user) => {
+    setUser(user);
+    setLogin(true);
+  };
   let logout = () => setLogin(false);
-  return { isLogin, setLogin, login, logout };
+  return { isLogin, setLogin, login, logout, user };
 }
 
 export const StateContainer = createContainer(useStore);

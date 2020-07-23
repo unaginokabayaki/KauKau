@@ -36,10 +36,12 @@ const StartScreen = ({ navigation }) => {
     console.log('StartScreen');
 
     (async () => {
-      let uid = await firebase.checkLoginUser();
-      if (uid) {
-        console.log('SkipAuth:' + uid);
-        context.login();
+      // 画面起動時、ログイン済みだったらメイン画面に遷移します
+      let { user } = await firebase.checkLoginUser();
+      console.log(user);
+      if (user) {
+        console.log('SkipAuth:' + user.uid);
+        context.login(user);
       }
     })();
   }, []);
@@ -58,6 +60,15 @@ const StartScreen = ({ navigation }) => {
 
   useYahooAccount = async () => {
     await firebase.signInWithYahoo();
+  };
+
+  loginAsGuest = async () => {
+    const { user } = await firebase.loginAsGuest();
+    if (!user.error) {
+      context.login(user);
+    } else {
+      console.log(user);
+    }
   };
 
   return (
@@ -124,7 +135,7 @@ const StartScreen = ({ navigation }) => {
         <Button
           title="Try now"
           type="clear"
-          onPress={() => context.login()}
+          onPress={loginAsGuest}
           buttonStyle={styles.roundButtonStyle}
           containerStyle={styles.roundButtonContainer}
         />
@@ -165,7 +176,7 @@ const LoginScreen = ({ navigation }) => {
 
       Alert.alert('Successfully logged in!');
 
-      context.login();
+      context.login(user);
     }
   };
 
@@ -322,14 +333,14 @@ const SignupScreen = () => {
   let [confPassword, setConfPassword] = React.useState('');
 
   signup = async () => {
-    let { uid, error } = await firebase.basicSignup(email, password, username);
+    let { user, error } = await firebase.basicSignup(email, password, username);
 
     if (error) {
       Alert.alert('Error', error);
     } else {
       Alert.alert('Account has been created!');
 
-      context.login();
+      context.login(user);
     }
   };
 

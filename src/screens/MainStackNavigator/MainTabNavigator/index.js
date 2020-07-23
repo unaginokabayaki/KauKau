@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, View, Button, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
+import { Button } from 'react-native-elements';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import HomeStackNavigator from 'app/src/screens/MainStackNavigator/MainTabNavigator/HomeStackNavigator';
@@ -84,9 +85,11 @@ const AccountStackNavigator = () => {
 };
 
 const AccountScreen = ({ navigation }) => {
+  let context = StateContainer.useContainer();
   return (
     <View style={styles.container}>
       <Text>AccountScreen</Text>
+      {context.user.isAnonymous && <Button title="Login to continue" />}
     </View>
   );
 };

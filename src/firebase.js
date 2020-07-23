@@ -128,7 +128,8 @@ class Firebase {
           this.fbUid = null;
         }
 
-        resolve(this.fbUid);
+        resolve({ user });
+        // resolve(this.fbUid);
       });
     });
   };
@@ -149,7 +150,7 @@ class Firebase {
       await user.sendEmailVerification();
 
       console.log(user);
-      return { uid: user.uid };
+      return { user };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
@@ -181,6 +182,18 @@ class Firebase {
     try {
       await firebase.auth().signOut();
       return true;
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  loginAsGuest = async () => {
+    try {
+      let { user } = await firebase.auth().signInAnonymously();
+
+      console.log(user);
+      return { user: user };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
