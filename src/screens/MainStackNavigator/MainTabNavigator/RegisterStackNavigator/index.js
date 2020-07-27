@@ -28,6 +28,7 @@ import { Icon } from 'react-native-elements';
 
 import { DragSortableView, AutoDragSortableView } from 'react-native-drag-sort';
 import Spinner from 'react-native-loading-spinner-overlay';
+import SwipeablePanel from 'rn-swipeable-panel';
 
 import firebase from 'app/src/firebase';
 
@@ -77,6 +78,7 @@ const RegisterScreen = ({ navigation, route }) => {
   let [isScrollEnabled, setScrollEnabled] = React.useState(true);
   let [parentWidth, setParentWidth] = React.useState(0);
   let [spinner, setSpinner] = React.useState(false);
+  let [showCamera, setShowCamera] = React.useState(false);
 
   // 入力項目
   let [form, setForm] = React.useState({
@@ -202,7 +204,8 @@ const RegisterScreen = ({ navigation, route }) => {
               addImage(uri);
             }
           } else if (buttonIndex === 2) {
-            // change image
+            // take photo
+            setShowCamera(true);
           }
         }
       );
@@ -370,6 +373,14 @@ const RegisterScreen = ({ navigation, route }) => {
         textContent={'送信中...'}
         textStyle={{ color: 'white' }}
       />
+      <SwipeablePanel
+        isActive={showCamera}
+        showCloseButton={true}
+        onlyLarge={true}
+        style={{ height: '80%' }}
+        barStyle={{ width: '30%' }}
+        onClose={() => setShowCamera(false)}
+      ></SwipeablePanel>
       <ScrollView>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
