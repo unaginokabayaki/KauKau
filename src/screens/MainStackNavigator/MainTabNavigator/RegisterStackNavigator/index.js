@@ -205,7 +205,8 @@ const RegisterScreen = ({ navigation, route }) => {
             }
           } else if (buttonIndex === 2) {
             // take photo
-            setShowCamera(true);
+            navigation.navigate('Photo', { screen: 'TakePhoto' });
+            // setShowCamera(true);
           }
         }
       );

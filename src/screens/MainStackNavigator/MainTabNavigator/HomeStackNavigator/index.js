@@ -27,7 +27,7 @@ const itemWidth = (Window.width - 10) / numColumns;
 const HomeStack = createStackNavigator();
 const HomeStackNavigator = () => {
   return (
-    <HomeStack.Navigator mode="modal">
+    <HomeStack.Navigator>
       <HomeStack.Screen
         name="Home"
         component={HomeScreen}
