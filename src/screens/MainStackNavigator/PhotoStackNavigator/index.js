@@ -49,7 +49,12 @@ const TakePhotoScreen = ({ navigation }) => {
       headerRight: () => (
         <Button
           title="完了"
-          onPress={() => navigation.navigate('Main', { screen: 'register' })}
+          onPress={() =>
+            navigation.navigate('RegisterStack', {
+              screen: 'Register',
+              params: { images: images },
+            })
+          }
         />
       ),
     });
@@ -93,7 +98,7 @@ const TakePhotoScreen = ({ navigation }) => {
 
         const newImages = [...images];
         newImages.push(photo);
-        setImages(images);
+        setImages(newImages);
         // use FileSystem to make permanent
       } catch (e) {
         console.log(e);
@@ -153,8 +158,13 @@ const ImageFrame = (props) => {
       style={{
         width: 80,
         height: 80,
-        backgroundColor: 'gray',
         borderRadius: 5,
+        overflow: 'hidden',
+      }}
+      resizeMode="contain"
+      containerStyle={{
+        // borderRadius: 5,
+        // borderWidth: 1,
         margin: 5,
       }}
     ></Image>

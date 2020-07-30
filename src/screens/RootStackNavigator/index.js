@@ -16,7 +16,7 @@ const RootkNavigator = () => {
       {context.isLogin ? (
         <RootStack.Navigator option={{}} screenOptions={{ headerShown: false }}>
           <RootStack.Screen
-            name="Drawer"
+            name="DrawerStack"
             component={SideDrawerNavigator}
             options={({ navigation }) => ({
               // headerLeft: () => <DrawerButton navigation={navigation} />,
@@ -27,7 +27,7 @@ const RootkNavigator = () => {
       ) : (
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
           <RootStack.Screen
-            name="Auth"
+            name="AuthStack"
             component={AuthStackNavigator}
             options={{ animationEnabled: false }}
           />

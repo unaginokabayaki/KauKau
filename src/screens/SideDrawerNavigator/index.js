@@ -30,7 +30,7 @@ const SideDrawerNavigator = () => {
       )}
     >
       <SideDrawer.Screen
-        name="Main"
+        name="MainStack"
         component={MainStackNavigator}
         options={{
           drawerLabel: 'Main',
@@ -38,7 +38,7 @@ const SideDrawerNavigator = () => {
         }}
       />
       <SideDrawer.Screen
-        name="About"
+        name="AboutStack"
         component={AboutStackNavigator}
         options={{
           drawerIcon: (props) => (
@@ -47,7 +47,7 @@ const SideDrawerNavigator = () => {
         }}
       />
       <SideDrawer.Screen
-        name="Help"
+        name="HelpStack"
         component={HelpStackNavigator}
         options={{
           drawerIcon: (props) => (
@@ -56,7 +56,7 @@ const SideDrawerNavigator = () => {
         }}
       />
       <SideDrawer.Screen
-        name="Setting"
+        name="SettingStack"
         component={SettingStackNavigator}
         options={{
           drawerIcon: (props) => <Ionicons name="md-settings" {...props} />,

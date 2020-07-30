@@ -118,6 +118,7 @@ const RegisterScreen = ({ navigation, route }) => {
 
   // 選択画面での選択値を受け取って更新
   React.useEffect(() => {
+    console.log(route.params);
     if (route.params?.category) {
       setForm({ ...form, category: route.params.category });
     }
@@ -125,6 +126,15 @@ const RegisterScreen = ({ navigation, route }) => {
       setForm({ ...form, condition: route.params.condition });
     }
   }, [route.params?.category, route.params?.condition]);
+
+  React.useEffect(() => {
+    console.log(route.params);
+    if (route.params?.images) {
+      let newImages = [...route.params?.images];
+      setImages(newImages);
+      setParentWidth(imageFlameWidth(newImages));
+    }
+  }, [route.params?.images]);
 
   // フォーマット済み価格が変更されたら、メモリ上で戻す
   React.useEffect(() => {
@@ -205,7 +215,7 @@ const RegisterScreen = ({ navigation, route }) => {
             }
           } else if (buttonIndex === 2) {
             // take photo
-            navigation.navigate('Photo', { screen: 'TakePhoto' });
+            navigation.navigate('PhotoStack', { screen: 'TakePhoto' });
             // setShowCamera(true);
           }
         }
@@ -383,6 +393,7 @@ const RegisterScreen = ({ navigation, route }) => {
         onClose={() => setShowCamera(false)}
       ></SwipeablePanel>
       <ScrollView>
+        <Text>params: {JSON.stringify(route.params)}</Text>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
           <ScrollView horizontal scrollEnabled={isScrollEnabled}>

@@ -21,7 +21,7 @@ const MainTabNavigator = ({ navigation }) => {
       tabBarOptions={{ showLabel: true, activeTintColor: '#e91e63' }}
     >
       <MainTab.Screen
-        name="Home"
+        name="HomeStack"
         component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -30,7 +30,7 @@ const MainTabNavigator = ({ navigation }) => {
         }}
       />
       <MainTab.Screen
-        name="Register"
+        name="RegisterStack"
         component={RegisterStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -39,7 +39,7 @@ const MainTabNavigator = ({ navigation }) => {
         }}
       />
       <MainTab.Screen
-        name="Account"
+        name="AccountStack"
         component={AccountStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -86,7 +86,7 @@ const AccountStackNavigator = () => {
   );
 };
 
-const AccountScreen = ({ navigation }) => {
+const AccountScreen = ({ navigation, route }) => {
   let context = StateContainer.useContainer();
   // let overlayRef = React.useRef(null);
 

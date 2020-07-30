@@ -23,9 +23,9 @@ const MainStackNavigator = () => {
         ...TransitionPresets.ModalPresentationIOS,
       }}
     >
-      <MainStack.Screen name="Main" component={MainTabNavigator} />
+      <MainStack.Screen name="MainTab" component={MainTabNavigator} />
       <MainStack.Screen
-        name="Photo"
+        name="PhotoStack"
         component={PhotoStackNavigator}
         // options={{
         //   gestureEnabled: true,
