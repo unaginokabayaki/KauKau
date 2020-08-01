@@ -9,7 +9,7 @@ export function useStore(initialState = 0) {
     setLogin(true);
   };
   let logout = () => setLogin(false);
-  return { isLogin, setLogin, login, logout, user };
+  return { isLogin, setLogin, login, logout, user, setUser };
 }
 
 export const StateContainer = createContainer(useStore);

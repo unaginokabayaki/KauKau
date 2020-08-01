@@ -393,7 +393,6 @@ const RegisterScreen = ({ navigation, route }) => {
         onClose={() => setShowCamera(false)}
       ></SwipeablePanel>
       <ScrollView>
-        <Text>params: {JSON.stringify(route.params)}</Text>
         <View style={{ height: 110 }}>
           <Text>画像</Text>
           <ScrollView horizontal scrollEnabled={isScrollEnabled}>

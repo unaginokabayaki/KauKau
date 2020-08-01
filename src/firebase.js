@@ -315,7 +315,11 @@ class Firebase {
       try {
         let paths = [];
         for (let item of images) {
-          let uploadedPath = await this.uploadFile(itemId, item.uri);
+          const ext = uri.split('.').slice(-1)[0];
+          const filename = await this.newFileName();
+          const path = `item/${id}/${filename}.${ext}`;
+
+          let uploadedPath = await this.uploadFile(path, item.uri);
           console.log('new file is uploaded');
           paths.push(uploadedPath);
         }
@@ -370,11 +374,8 @@ class Firebase {
     return randomBytes.reduce((a, c) => a + (c % 32).toString(32));
   };
 
-  uploadFile = async (itemId, uri) => {
+  uploadFile = async (path, uri) => {
     try {
-      const ext = uri.split('.').slice(-1)[0];
-      const filename = await this.newFileName();
-      const path = `item/${itemId}/${filename}.${ext}`;
       console.log(`Upload to: ${path}`);
 
       let storageRef = firebase.storage().ref().child(path);
@@ -459,6 +460,47 @@ class Firebase {
       }
 
       let data = { id, ...doc.data() };
+
+      return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  getUser = async (id) => {
+    try {
+      let doc = await this.user.doc(id).get();
+      if (!doc.exists) {
+        throw Error('No such document');
+      }
+
+      let data = { id, ...doc.data() };
+
+      return { user: data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  updateUser = async (user) => {
+    try {
+      const ext = user.image_uri.split('.').slice(-1)[0];
+      const filename = 'profile_icon';
+      const path = `user/${user.id}/${filename}.${ext}`;
+
+      let uploadedPath = await this.uploadFile(path, user.image_uri);
+      console.log('new file is uploaded');
+
+      let data = {
+        name: user.name,
+        profile: user.profile,
+        image_uri: uploadedPath,
+        updated_time: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      const docUplRef = await this.user.doc(`${user.id}`).update(data);
 
       return { data };
     } catch (e) {
