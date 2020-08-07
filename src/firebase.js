@@ -376,6 +376,7 @@ class Firebase {
 
   uploadFile = async (path, uri) => {
     try {
+      console.log(`Upload from: ${uri}`);
       console.log(`Upload to: ${path}`);
 
       let storageRef = firebase.storage().ref().child(path);
@@ -413,7 +414,7 @@ class Firebase {
           async () => {
             unsbscribe();
             const url = await uploadTask.snapshot.ref.getDownloadURL();
-            console.log(url);
+            console.log('download:' + url);
             // return url;
             resolve(url);
           }
@@ -486,19 +487,23 @@ class Firebase {
 
   updateUser = async (user) => {
     try {
-      const ext = user.image_uri.split('.').slice(-1)[0];
-      const filename = 'profile_icon';
-      const path = `user/${user.id}/${filename}.${ext}`;
-
-      let uploadedPath = await this.uploadFile(path, user.image_uri);
-      console.log('new file is uploaded');
-
       let data = {
         name: user.name,
         profile: user.profile,
-        image_uri: uploadedPath,
         updated_time: firebase.firestore.FieldValue.serverTimestamp(),
       };
+
+      // 参照先がローカルの場合のみ更新
+      if (user.image_uri.startsWith('file://')) {
+        const ext = user.image_uri.split('.').slice(-1)[0];
+        const filename = 'profile_icon';
+        const path = `user/${user.id}/${filename}.${ext}`;
+
+        let uploadedPath = await this.uploadFile(path, user.image_uri);
+        console.log('new file is uploaded');
+
+        data = { ...data, image_uri: uploadedPath };
+      }
 
       const docUplRef = await this.user.doc(`${user.id}`).update(data);
 
