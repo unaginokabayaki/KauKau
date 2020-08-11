@@ -56,8 +56,10 @@ const AccountScreen = ({ navigation, route }) => {
     console.log(context.user);
     (async () => {
       let { user } = await firebase.getUser(context.user.uid);
-      console.log(user);
-      setUser(user);
+      if (user) {
+        console.log(user);
+        setUser(user);
+      }
     })();
   }, [showLogin]);
 
@@ -150,8 +152,10 @@ const UserScreen = ({ navigation, route }) => {
     console.log(route.params.uid);
     (async () => {
       let { user } = await firebase.getUser(route.params.uid);
-      console.log(user);
-      setUser(user);
+      if (user) {
+        console.log(user);
+        setUser(user);
+      }
     })();
   }, [route.params]);
 
@@ -226,13 +230,15 @@ const UserEditScreen = ({ navigation, route }) => {
     console.log(route.params.uid);
     (async () => {
       let { user } = await firebase.getUser(route.params.uid);
-      console.log(user);
-      setForm({
-        id: user.id,
-        image_uri: user.image_uri,
-        name: user.name,
-        profile: user.profile,
-      });
+      if (user) {
+        console.log(user);
+        setForm({
+          id: user.id,
+          image_uri: user.image_uri,
+          name: user.name,
+          profile: user.profile,
+        });
+      }
     })();
   }, []);
 

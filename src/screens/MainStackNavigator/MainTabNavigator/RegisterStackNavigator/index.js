@@ -560,7 +560,7 @@ const RegisterScreen = ({ navigation, route }) => {
             }}
           />
           <Button
-            title="確認する"
+            title="出品する"
             containerStyle={{ flex: 1, margin: 10 }}
             buttonStyle={{ backgroundColor: 'tomato' }}
             onPress={async () => {
