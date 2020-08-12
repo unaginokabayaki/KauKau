@@ -425,9 +425,13 @@ class Firebase {
     }
   };
 
-  getItems = async (cursor = null, num = 3) => {
+  getItems = async (cursor = null, keyword = '', num = 6) => {
     try {
-      let ref = this.item.orderBy('created_time', 'desc').limit(num);
+      let ref = this.item;
+      if (keyword) {
+        ref = ref.where('title', '==', keyword);
+      }
+      ref = ref.orderBy('created_time', 'desc').limit(num);
 
       // 最後尾の次のデータから始める
       if (cursor) {

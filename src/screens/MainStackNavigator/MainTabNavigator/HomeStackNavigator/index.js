@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Text,
   View,
@@ -13,7 +13,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Image, ListItem, Button } from 'react-native-elements';
+import { Image, ListItem, Button, SearchBar } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 
 import DrawerButton from 'app/src/common/DrawerButton';
@@ -21,7 +21,7 @@ import firebase from 'app/src/firebase';
 import styles from './styles';
 
 const Window = Dimensions.get('window');
-const numColumns = 1;
+const numColumns = 3;
 const itemWidth = (Window.width - 10) / numColumns;
 
 const HomeStack = createStackNavigator();
@@ -46,6 +46,8 @@ const HomeScreen = ({ navigation }) => {
   const [cursor, setCursor] = React.useState(null);
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const searchBarRef = React.useRef(null);
 
   React.useEffect(() => {
     // 初回ロード
@@ -54,15 +56,13 @@ const HomeScreen = ({ navigation }) => {
     })();
   }, []);
 
-  const loadData = async (cursor = null) => {
+  const loadData = async (text = '', cursor = null) => {
     setLoading(true);
-    let res = await firebase.getItems(cursor);
+    let res = await firebase.getItems(cursor, text);
     if (!res.error) {
       console.log(res.data.length);
-      if (res.cursor) {
-        setItemList(cursor ? itemList.concat(res.data) : res.data);
-        setCursor(res.cursor);
-      }
+      setItemList(cursor ? itemList.concat(res.data) : res.data);
+      setCursor(res.cursor);
     }
     setLoading(false);
   };
@@ -74,7 +74,9 @@ const HomeScreen = ({ navigation }) => {
   onEndReached = async () => {
     // 最後尾を表示したら次のデータロード
     console.log('this is the end');
-    await loadData(cursor);
+    if (!loading && cursor) {
+      await loadData(search, cursor);
+    }
   };
 
   renderItem = ({ item, index, separators }) => {
@@ -114,8 +116,23 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  searchItem = async (text) => {
+    setSearch(text);
+    await loadData(text);
+  };
+
   return (
     <View style={styles.container}>
+      <SearchBar
+        ref={searchBarRef}
+        placeholder="Search by keyword"
+        onChangeText={(text) => searchItem(text)}
+        value={search}
+        lightTheme={true}
+        showCancel={true}
+        onClear={() => searchItem('')}
+        onCancel={() => null}
+      />
       <FlatList
         data={itemList}
         renderItem={renderItem}
@@ -126,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
         refreshing={refreshing}
         onRefresh={async () => {
           setRefreshing(true);
-          await loadData();
+          await loadData(search);
           setRefreshing(false);
         }}
         ListFooterComponent={
