@@ -473,6 +473,21 @@ class Firebase {
     }
   };
 
+  isLikedItem = async (itemId) => {
+    try {
+      let likedRef = await this.user
+        .doc(`${this.fbUid}`)
+        .collection('liked_item')
+        .doc(`${itemId}`)
+        .get();
+
+      return { exists: likedRef.exists };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
   getUser = async (id) => {
     try {
       let doc = await this.user.doc(id).get();
@@ -535,7 +550,7 @@ class Firebase {
         res = await likeRef.delete();
       }
 
-      console.log(res);
+      // console.log(res);
 
       return true;
     } catch (e) {

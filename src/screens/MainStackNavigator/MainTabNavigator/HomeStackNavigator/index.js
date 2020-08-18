@@ -13,7 +13,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Image, ListItem, Button, SearchBar } from 'react-native-elements';
+import {
+  Image,
+  ListItem,
+  Button,
+  SearchBar,
+  Icon,
+} from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 
 import DrawerButton from 'app/src/common/DrawerButton';
@@ -176,6 +182,12 @@ const ItemScreen = ({ route, navigation }) => {
       if (!res.error) {
         // console.log(res.data);
         setItem(res.data);
+
+        // いいね取得
+        const liked = await firebase.isLikedItem(itemId);
+        if (!liked.error) {
+          setLike(liked.exists);
+        }
       }
     })();
   }, []);
@@ -183,6 +195,25 @@ const ItemScreen = ({ route, navigation }) => {
   const toggleLike = async () => {
     await firebase.toggleLike(itemId, !like);
     setLike(!like);
+  };
+
+  const likeIcon = (like) => {
+    const LikeIconBase = (props) => {
+      return (
+        <Icon
+          {...props}
+          type={'ionicon'}
+          size={14}
+          containerStyle={{ marginRight: 5 }}
+        />
+      );
+    };
+
+    return like ? (
+      <LikeIconBase name="md-heart" color="red" />
+    ) : (
+      <LikeIconBase name="md-heart-empty" color="gray" />
+    );
   };
 
   return (
@@ -255,11 +286,12 @@ const ItemScreen = ({ route, navigation }) => {
             >
               <View style={{ flexDirection: 'row' }}>
                 <Button
-                  title={'いいね' + (like ? '●' : '')}
+                  title={'いいね'}
                   buttonStyle={styles.roundButtonStyle}
                   titleStyle={styles.roundButtonTitleStyle}
                   containerStyle={styles.roundButtonContainer}
                   onPress={toggleLike}
+                  icon={likeIcon(like)}
                 />
                 <Button
                   title="コメント"
