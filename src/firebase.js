@@ -115,8 +115,8 @@ class Firebase {
       // signin singoutで実行される、オブザーバ関数
       firebase.auth().onAuthStateChanged(async (user) => {
         // await this.wait(3000);
-        if (user && user.emailVerified) {
-          // if (user) {
+        // if (user && user.emailVerified) {
+        if (user) {
           // User is signed in.
           console.log('User: ' + user.uid);
 
@@ -512,6 +512,32 @@ class Firebase {
       const docUplRef = await this.user.doc(`${user.id}`).update(data);
 
       return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  toggleLike = async (itemId, toggle) => {
+    try {
+      const likeRef = this.user
+        .doc(`${this.fbUid}`)
+        .collection('liked_item')
+        .doc(`${itemId}`);
+
+      let res = null;
+      if (toggle) {
+        res = await likeRef.set({
+          id: itemId,
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        res = await likeRef.delete();
+      }
+
+      console.log(res);
+
+      return true;
     } catch (e) {
       console.log(e.message);
       return { error: e.message };

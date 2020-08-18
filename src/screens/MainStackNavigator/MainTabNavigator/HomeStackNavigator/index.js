@@ -168,6 +168,7 @@ const HomeScreen = ({ navigation }) => {
 const ItemScreen = ({ route, navigation }) => {
   const { itemId } = route.params;
   const [item, setItem] = React.useState({});
+  const [like, setLike] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -178,6 +179,11 @@ const ItemScreen = ({ route, navigation }) => {
       }
     })();
   }, []);
+
+  const toggleLike = async () => {
+    await firebase.toggleLike(itemId, !like);
+    setLike(!like);
+  };
 
   return (
     <View style={{ justifyContent: 'flex-end' }}>
@@ -249,10 +255,11 @@ const ItemScreen = ({ route, navigation }) => {
             >
               <View style={{ flexDirection: 'row' }}>
                 <Button
-                  title="いいね"
+                  title={'いいね' + (like ? '●' : '')}
                   buttonStyle={styles.roundButtonStyle}
                   titleStyle={styles.roundButtonTitleStyle}
                   containerStyle={styles.roundButtonContainer}
+                  onPress={toggleLike}
                 />
                 <Button
                   title="コメント"
