@@ -558,6 +558,61 @@ class Firebase {
       return { error: e.message };
     }
   };
+
+  addComment = async (itemId, comment) => {
+    try {
+      const addRef = await this.item
+        .doc(`${itemId}`)
+        .collection('comment')
+        .add({
+          text: comment.text,
+          userId: comment.user._id,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      console.log(`new comment is created: ${addRef.id}`);
+
+      const docRef = await this.item
+        .doc(`${itemId}`)
+        .collection('comment')
+        .doc(`${addRef.id}`)
+        .get();
+      // console.log(docRef);
+
+      return { id: docRef.id, ...docRef.data() };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  getComments = async (itemId) => {
+    try {
+      const collection = await this.item
+        .doc(`${itemId}`)
+        .collection('comment')
+        .orderBy('createdAt')
+        .get();
+
+      const data = await Promise.all(
+        collection.docs.map(async (doc) => {
+          const { user } = await this.getUser(doc.data().userId);
+          // const user = await this.user.doc(`${doc.data().userId}`).get();
+          // console.log(user);
+          return {
+            id: doc.id,
+            ...doc.data(),
+            user: user,
+            // user: { id: user.id, ...user.data() },
+          };
+        })
+      );
+
+      return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
 }
 
 export default new Firebase(firebaseConfig);

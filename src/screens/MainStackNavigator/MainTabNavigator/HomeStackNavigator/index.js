@@ -42,6 +42,7 @@ const HomeStackNavigator = () => {
         })}
       />
       <HomeStack.Screen name="Item" component={ItemScreen} />
+      <HomeStack.Screen name="Chat" component={ChatScreen} />
     </HomeStack.Navigator>
   );
 };
@@ -298,6 +299,9 @@ const ItemScreen = ({ route, navigation }) => {
                   buttonStyle={styles.roundButtonStyle}
                   titleStyle={styles.roundButtonTitleStyle}
                   containerStyle={styles.roundButtonContainer}
+                  onPress={() =>
+                    navigation.navigate('Chat', { itemId: itemId })
+                  }
                 />
               </View>
               <Button
@@ -367,6 +371,126 @@ const ItemScreen = ({ route, navigation }) => {
           titleStyle={{ fontSize: 14, fontWeight: '500' }}
         />
       </View>
+    </View>
+  );
+};
+
+import { GiftedChat, Send, Bubble, Message } from 'react-native-gifted-chat';
+
+const ChatScreen = ({ route, navigation }) => {
+  const { itemId } = route.params;
+  let context = StateContainer.useContainer();
+  const [messages, setMessages] = React.useState([]);
+
+  React.useEffect(() => {
+    (async () => {
+      console.log(context.user);
+      const result = await firebase.getComments(itemId);
+      if (!result.error) {
+        let messages = result.data.map((doc) => {
+          return {
+            _id: doc.id,
+            text: doc.text,
+            createdAt: doc.createdAt.toDate(),
+            user: {
+              _id: doc.userId,
+              name: doc.user.name,
+              avatar: doc.user.image_uri,
+            },
+          };
+        });
+        setMessages(messages.reverse());
+      }
+    })();
+
+    // console.log(context.user);
+    // setMessages(
+    //   [
+    //     {
+    //       _id: 1,
+    //       text: 'Hello developer',
+    //       createdAt: new Date(),
+    //       user: {
+    //         _id: 2,
+    //         name: 'React Native',
+    //         avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+    //       },
+    //     },
+
+    //     {
+    //       _id: 2,
+    //       text: 'Of course',
+    //       createdAt: new Date(),
+    //       user: {
+    //         _id: context.user.uid,
+    //         name: 'React Native',
+    //         avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    //       },
+    //     },
+    //     {
+    //       _id: 3,
+    //       text: 'Nice too see you',
+    //       createdAt: new Date(),
+    //       user: {
+    //         _id: 2,
+    //         name: 'React Native',
+    //         avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+    //       },
+    //     },
+    //   ].reverse()
+    // );
+  }, []);
+
+  const onSend = React.useCallback(async (messages = []) => {
+    const res = await firebase.addComment(itemId, messages[0]);
+    console.log(res);
+    if (!res.error) {
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, [
+          {
+            ...messages[0],
+            _id: res.id,
+            text: res.text,
+            creaatedAt: res.createdAt,
+          },
+        ])
+      );
+    }
+  }, []);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: 'lightgray' }}>
+      <GiftedChat
+        messages={messages}
+        onSend={onSend}
+        user={{
+          _id: context.user.uid,
+          name: 'ME',
+          avatar: 'https://randomuser.me/api/portraits/lego/5.jpg',
+        }}
+        alignTop={true}
+        showUserAvatar={true}
+        renderUsernameOnMessage={true}
+        // inverted={true}
+        renderAvatarOnTop={true}
+        // showAvatarForEveryMessage={true}
+        alwaysShowSend={true}
+        renderSend={(props) => (
+          <Send {...props} containerStyle={{ justifyContent: 'center' }}>
+            <Icon
+              type="ionicon"
+              name="md-send"
+              color="green"
+              containerStyle={{ marginRight: 5 }}
+            />
+          </Send>
+        )}
+        // renderAccessory={() => <Button title="picture" />}
+        // renderChatEmpty={() => <Text>No message to show</Text>}
+        bottomOffset={48}
+        maxInputLength={140}
+        scrollToBottom={true}
+      />
     </View>
   );
 };
