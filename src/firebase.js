@@ -315,10 +315,9 @@ class Firebase {
       try {
         let paths = [];
         for (let item of images) {
-          const ext = uri.split('.').slice(-1)[0];
+          const ext = item.uri.split('.').slice(-1)[0];
           const filename = await this.newFileName();
-          const path = `item/${id}/${filename}.${ext}`;
-
+          const path = `item/${itemId}/${filename}.${ext}`;
           let uploadedPath = await this.uploadFile(path, item.uri);
           console.log('new file is uploaded');
           paths.push(uploadedPath);
@@ -338,7 +337,6 @@ class Firebase {
         created_time: firebase.firestore.FieldValue.serverTimestamp(),
       });
       console.log(`new item is created: ${docRef.id}`);
-
       // 画像アップロード
       const imageUploadedPath = await this.saveImages(docRef.id, images);
       // console.log(imageUploadedPath);

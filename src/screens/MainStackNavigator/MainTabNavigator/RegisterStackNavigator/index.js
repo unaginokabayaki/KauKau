@@ -10,6 +10,8 @@ import {
   FlatList,
   ActionSheetIOS,
   Image,
+  Alert,
+  Button as NativeButton,
 } from 'react-native';
 import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
 
@@ -100,10 +102,28 @@ const RegisterScreen = ({ navigation, route }) => {
 
   const headerHeight = useHeaderHeight();
 
+  const resetForm = () => {
+    setParentWidth(0);
+    setImages([]);
+    setForm({
+      title: '',
+      description: '',
+      category: '',
+      condition: '',
+      price: 0,
+    });
+    setFormattedPrice('');
+    setWordCounter({ title: 0, description: 0 });
+  };
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <NativeButton title="クリア" onPress={resetForm} />,
+    });
+  });
+
   React.useEffect(() => {
     let newImages = [
-      // { uri: 'test.png' },
-      // { uri: 'test.png' },
       // { uri: 'test.png' },
     ];
     setImages(newImages);
@@ -552,9 +572,10 @@ const RegisterScreen = ({ navigation, route }) => {
               // スピナー終了直後は少し間を空けないとうまく行かない
               setTimeout(() => {
                 if (!error) {
-                  alert('下書き保存しました');
+                  Alert.alert('下書き保存しました');
+                  resetForm();
                 } else {
-                  alert('エラーが発生しました');
+                  Alert.alert('エラーが発生しました');
                 }
               }, 100);
             }}
@@ -575,9 +596,10 @@ const RegisterScreen = ({ navigation, route }) => {
               // スピナー終了直後は少し間を空けないとうまく行かない
               setTimeout(() => {
                 if (!error) {
-                  alert('出品が完了しました');
+                  Alert.alert('出品が完了しました');
+                  resetForm();
                 } else {
-                  alert('エラーが発生しました');
+                  Alert.alert('エラーが発生しました');
                 }
               }, 100);
             }}

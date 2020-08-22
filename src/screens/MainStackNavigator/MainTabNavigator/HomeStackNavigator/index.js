@@ -98,7 +98,7 @@ const HomeScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Item', { itemId: item.id })}
       >
         <Image
-          source={{ uri: item.image_uri[0] }}
+          source={{ uri: item.image_uri?.[0] }}
           style={{
             width: itemWidth - 4,
             height: itemWidth - 4,
@@ -286,9 +286,6 @@ const ItemScreen = ({ route, navigation }) => {
               }}
             >
               {item.title}
-              {
-                'describes how to shrink children along the main axis in the case in which the total'
-              }
             </Text>
 
             <View
