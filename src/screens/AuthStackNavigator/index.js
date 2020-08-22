@@ -37,11 +37,12 @@ const StartScreen = ({ navigation }) => {
 
     (async () => {
       // 画面起動時、ログイン済みだったらメイン画面に遷移します
-      let { user } = await firebase.checkLoginUser();
-      console.log(user);
-      if (user) {
-        console.log('SkipAuth:' + user.uid);
-        context.login(user);
+      let { authInfo } = await firebase.checkLoginUser();
+      console.log(authInfo);
+      if (authInfo) {
+        console.log('SkipAuth:' + authInfo.uid);
+        let { user } = await firebase.getUser(authInfo.uid);
+        context.login(authInfo, user);
       }
     })();
   }, []);
@@ -63,11 +64,12 @@ const StartScreen = ({ navigation }) => {
   };
 
   loginAsGuest = async () => {
-    const { user } = await firebase.loginAsGuest();
-    if (!user.error) {
-      context.login(user);
+    const { authInfo } = await firebase.loginAsGuest();
+    if (!authInfo.error) {
+      let { user } = await firebase.getUser(authInfo.uid);
+      context.login(authInfo, user);
     } else {
-      console.log(user);
+      console.log(authInfo);
     }
   };
 
@@ -155,7 +157,7 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   login = async () => {
-    let { user, error } = await firebase.basicLogin(email, password);
+    let { authInfo, error } = await firebase.basicLogin(email, password);
 
     if (error) {
       Alert.alert('Error', error);
@@ -176,7 +178,8 @@ const LoginScreen = ({ navigation }) => {
 
       Alert.alert('Successfully logged in!');
 
-      context.login(user);
+      let { user } = await firebase.getUser(authInfo.uid);
+      context.login(authInfo, user);
     }
   };
 
@@ -333,14 +336,19 @@ const SignupScreen = () => {
   let [confPassword, setConfPassword] = React.useState('');
 
   signup = async () => {
-    let { user, error } = await firebase.basicSignup(email, password, username);
+    let { authInfo, error } = await firebase.basicSignup(
+      email,
+      password,
+      username
+    );
 
     if (error) {
       Alert.alert('Error', error);
     } else {
       Alert.alert('Account has been created!');
 
-      context.login(user);
+      let { user } = await firebase.getUser(authInfo.uid);
+      context.login(authInfo, user);
     }
   };
 

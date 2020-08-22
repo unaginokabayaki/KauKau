@@ -12,7 +12,7 @@ const LoginOverlay = (props) => {
   let [password, setPassword] = React.useState('');
 
   login = async () => {
-    let { user, error } = await firebase.basicLogin(email, password);
+    let { authInfo, error } = await firebase.basicLogin(email, password);
 
     if (error) {
       Alert.alert('Error', error);
@@ -33,8 +33,10 @@ const LoginOverlay = (props) => {
 
       Alert.alert('Successfully logged in!');
 
+      let { user } = await firebase.getUser(authInfo.uid);
+
       // ログイン情報を記録
-      context.login(user);
+      context.login(authInfo, user);
       // 自分を閉じる
       props.setShowLogin(false);
     }

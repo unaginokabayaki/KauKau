@@ -2,14 +2,19 @@ import React from 'react';
 import { createContainer } from 'unstated-next';
 
 export function useStore(initialState = 0) {
-  let [isLogin, setLogin] = React.useState(false);
-  let [user, setUser] = React.useState({});
-  let login = (user) => {
+  const [isLogin, setLogin] = React.useState(false);
+  const [authInfo, setAuthInfo] = React.useState({});
+  const [user, setUser] = React.useState({});
+  const updateUser = (values) => {
+    setUser({ ...user, ...values });
+  };
+  const login = (authInfo, user) => {
+    setAuthInfo(authInfo);
     setUser(user);
     setLogin(true);
   };
-  let logout = () => setLogin(false);
-  return { isLogin, setLogin, login, logout, user, setUser };
+  const logout = () => setLogin(false);
+  return { isLogin, setLogin, login, logout, authInfo, user, updateUser };
 }
 
 export const StateContainer = createContainer(useStore);

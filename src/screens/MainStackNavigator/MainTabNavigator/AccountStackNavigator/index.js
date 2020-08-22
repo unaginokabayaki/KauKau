@@ -30,6 +30,17 @@ import LoginOverlay from 'app/src/common/LoginOverlay';
 
 import firebase from 'app/src/firebase';
 
+const convertToCurrency = (num) => {
+  return '¥' + num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+};
+
+const convertFromCurrency = (num) => {
+  let temp = num.replace('¥', '');
+  temp = temp.replace(',', '');
+  temp = temp.replace(' ', '');
+  return temp;
+};
+
 const AccountStack = createStackNavigator();
 const AccountStackNavigator = () => {
   return (
@@ -43,6 +54,7 @@ const AccountStackNavigator = () => {
       />
       <AccountStack.Screen name="User" component={UserScreen} />
       <AccountStack.Screen name="UserEdit" component={UserEditScreen} />
+      <AccountStack.Screen name="Deposit" component={DepositScreen} />
     </AccountStack.Navigator>
   );
 };
@@ -55,7 +67,7 @@ const AccountScreen = ({ navigation, route }) => {
   React.useEffect(() => {
     console.log(context.user);
     (async () => {
-      let { user } = await firebase.getUser(context.user.uid);
+      let { user } = await firebase.getUser(context.user.id);
       if (user) {
         console.log(user);
         setUser(user);
@@ -137,6 +149,15 @@ const AccountScreen = ({ navigation, route }) => {
             bottomDivider
             chevron
             onPress={() => null}
+          />
+          <ListItem
+            title="残金"
+            bottomDivider
+            chevron
+            rightElement={
+              <Text>{convertToCurrency(context.user.deposit ?? 0)}</Text>
+            }
+            onPress={() => navigation.navigate('Deposit')}
           />
         </View>
       </View>
@@ -247,7 +268,7 @@ const UserEditScreen = ({ navigation, route }) => {
     let res = await firebase.updateUser(form);
     console.log(res);
     if (!res.error) {
-      context.setUser({ ...context.user, ...res.data });
+      context.updateUser({ ...res.data });
       navigation.navigate('User', { uid: route.params.uid });
     }
     setSpinner(false);
@@ -382,6 +403,69 @@ const UserEditScreen = ({ navigation, route }) => {
         onPress={updateUserProfile}
       />
     </ScrollView>
+  );
+};
+
+const DepositScreen = ({ route, navigation }) => {
+  let context = StateContainer.useContainer();
+  const [amount, setAmount] = React.useState('');
+
+  const chargeDeposit = async () => {
+    const numAmount = parseInt(convertFromCurrency(amount));
+    if (isNaN(numAmount) || numAmount === 0) {
+      Alert.alert('入金額を入力してください');
+      return;
+    }
+
+    // DB更新
+    const res = await firebase.updateDeposit(context.user.id, numAmount);
+
+    // Context更新
+    context.updateUser({ deposit: res.deposit });
+    console.log(context.user);
+
+    Alert.alert('入金しました', convertToCurrency(numAmount));
+
+    navigation.navigate('Account');
+  };
+
+  return (
+    <View>
+      <ListItem
+        title="残金"
+        bottomDivider
+        rightElement={
+          <Text>{convertToCurrency(context.user.deposit ?? 0)}</Text>
+        }
+      />
+      <ListItem
+        title="入金額"
+        bottomDivider
+        rightElement={
+          <TextInput
+            keyboardType="number-pad"
+            placeholder="¥100 ~ ¥1,000,000"
+            onFocus={() => {
+              console.log(convertFromCurrency(amount));
+              setAmount(convertFromCurrency(amount));
+            }}
+            onBlur={() => {
+              console.log(convertToCurrency(amount));
+              if (amount != '') {
+                setAmount(convertToCurrency(amount));
+              }
+            }}
+            onChangeText={(text) => {
+              setAmount(isNaN(text) ? amount : text);
+            }}
+            value={amount}
+            returnKeyType={'done'}
+          ></TextInput>
+        }
+      />
+
+      <Button title="入金する" style={{ margin: 5 }} onPress={chargeDeposit} />
+    </View>
   );
 };
 

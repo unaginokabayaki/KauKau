@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StateContainer } from 'app/src/AppContext';
@@ -217,6 +218,14 @@ const ItemScreen = ({ route, navigation }) => {
     );
   };
 
+  const buyItem = () => {
+    Alert.alert('購入しますか？', null, [
+      { text: 'キャンセル' },
+      { text: 'はい' },
+      // { text: 'はい', onPress: firebase.buyItem(itemId) },
+    ]);
+  };
+
   return (
     <View style={{ justifyContent: 'flex-end' }}>
       <ScrollView>
@@ -369,6 +378,7 @@ const ItemScreen = ({ route, navigation }) => {
           title="購入手続きへ"
           buttonStyle={{ backgroundColor: '#E8392E' }}
           titleStyle={{ fontSize: 14, fontWeight: '500' }}
+          onPress={buyItem}
         />
       </View>
     </View>
@@ -464,7 +474,7 @@ const ChatScreen = ({ route, navigation }) => {
         messages={messages}
         onSend={onSend}
         user={{
-          _id: context.user.uid,
+          _id: context.user.id,
           name: 'ME',
           avatar: 'https://randomuser.me/api/portraits/lego/5.jpg',
         }}

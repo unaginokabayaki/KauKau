@@ -128,7 +128,7 @@ class Firebase {
           this.fbUid = null;
         }
 
-        resolve({ user });
+        resolve({ authInfo: user });
         // resolve(this.fbUid);
       });
     });
@@ -150,7 +150,7 @@ class Firebase {
       await user.sendEmailVerification();
 
       console.log(user);
-      return { user };
+      return { authInfo: user };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
@@ -170,7 +170,7 @@ class Firebase {
       // }
 
       console.log(user);
-      return { user: user };
+      return { authInfo: user };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
@@ -193,7 +193,7 @@ class Firebase {
       let { user } = await firebase.auth().signInAnonymously();
 
       console.log(user);
-      return { user: user };
+      return { authInfo: user };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
@@ -490,7 +490,7 @@ class Firebase {
 
   getUser = async (id) => {
     try {
-      let doc = await this.user.doc(id).get();
+      let doc = await this.user.doc(`${id}`).get();
       if (!doc.exists) {
         throw Error('No such document');
       }
@@ -527,6 +527,25 @@ class Firebase {
       const docUplRef = await this.user.doc(`${user.id}`).update(data);
 
       return { data };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  updateDeposit = async (userId, amount) => {
+    try {
+      let data = {
+        deposit: firebase.firestore.FieldValue.increment(amount),
+        updated_time: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      const updateRef = await this.user.doc(`${userId}`);
+      await updateRef.update(data);
+
+      const snap = await updateRef.get();
+
+      return { id: snap.id, ...snap.data() };
     } catch (e) {
       console.log(e.message);
       return { error: e.message };
