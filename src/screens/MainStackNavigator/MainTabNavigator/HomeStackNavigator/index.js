@@ -120,6 +120,36 @@ const HomeScreen = ({ navigation }) => {
             </Text>
           </View>
         </Image>
+        <View
+          style={{
+            position: 'absolute',
+            left: 2,
+            top: 2,
+            display: item.status === 'sold' ? 'flex' : 'none',
+          }}
+        >
+          <View
+            style={{
+              borderLeftColor: 'red',
+              borderLeftWidth: 50,
+              borderBottomColor: 'transparent',
+              borderBottomWidth: 50,
+            }}
+          ></View>
+          <Text
+            style={{
+              position: 'absolute',
+              left: 2,
+              top: 10,
+              color: 'white',
+              transform: [{ rotate: '-45deg' }],
+              fontSize: 10,
+              fontWeight: '600',
+            }}
+          >
+            SOLD
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -226,6 +256,29 @@ const ItemScreen = ({ route, navigation }) => {
     ]);
   };
 
+  const buyButton = (item) => {
+    if (item.status === 'sold') {
+      return (
+        <Button
+          title="SOLD OUT"
+          titleStyle={{ fontSize: 14, fontWeight: '500' }}
+          disabled={true}
+        />
+      );
+    }
+
+    if (item.status === 'onsale') {
+      return (
+        <Button
+          title="購入手続きへ"
+          buttonStyle={{ backgroundColor: '#E8392E' }}
+          titleStyle={{ fontSize: 14, fontWeight: '500' }}
+          onPress={buyItem}
+        />
+      );
+    }
+  };
+
   return (
     <View style={{ justifyContent: 'flex-end' }}>
       <ScrollView>
@@ -275,6 +328,36 @@ const ItemScreen = ({ route, navigation }) => {
                 })}
               </Swiper>
             )}
+            <View
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                display: item.status === 'sold' ? 'flex' : 'none',
+              }}
+            >
+              <View
+                style={{
+                  borderLeftColor: 'red',
+                  borderLeftWidth: 120,
+                  borderBottomColor: 'transparent',
+                  borderBottomWidth: 120,
+                }}
+              ></View>
+              <Text
+                style={{
+                  position: 'absolute',
+                  left: 4,
+                  top: 24,
+                  color: 'white',
+                  transform: [{ rotate: '-45deg' }],
+                  fontSize: 28,
+                  fontWeight: '600',
+                }}
+              >
+                SOLD
+              </Text>
+            </View>
           </View>
 
           <View style={{ margin: 10 }}>
@@ -371,12 +454,7 @@ const ItemScreen = ({ route, navigation }) => {
             {convertToCurrency(item.item_price || 0)}
           </Text>
         </View>
-        <Button
-          title="購入手続きへ"
-          buttonStyle={{ backgroundColor: '#E8392E' }}
-          titleStyle={{ fontSize: 14, fontWeight: '500' }}
-          onPress={buyItem}
-        />
+        {buyButton(item)}
       </View>
     </View>
   );
