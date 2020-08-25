@@ -537,19 +537,56 @@ class Firebase {
     }
   };
 
-  updateDeposit = async (userId, amount) => {
+  updateDeposit = async (amount) => {
     try {
       let data = {
         deposit: firebase.firestore.FieldValue.increment(amount),
         updated_time: firebase.firestore.FieldValue.serverTimestamp(),
       };
 
-      const updateRef = await this.user.doc(`${userId}`);
+      const updateRef = await this.user.doc(`${this.fbUid}`);
       await updateRef.update(data);
 
       const snap = await updateRef.get();
 
       return { id: snap.id, ...snap.data() };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
+  buyItem = async (itemId) => {
+    try {
+      let userRef = await this.user.doc(`${this.fbUid}`);
+      let itemRef = await this.item.doc(`${itemId}`);
+
+      let tran = await this.db.runTransaction(async (t) => {
+        // 残高の取得
+        let user = await t.get(userRef);
+        // console.log(user.data());
+        let item = await t.get(itemRef);
+        // console.log(item.data());
+
+        if (item.data().status !== 'onsale') {
+          return Promise.reject(new Error('このアイテムは購入できません'));
+        }
+        // 決済処理
+        let newDeposit = user.data().deposit - item.data().item_price;
+        if (newDeposit < 0) {
+          return Promise.reject(new Error('残高が不足しています'));
+        }
+        await t.update(userRef, { deposit: newDeposit });
+
+        // ステータス変更
+        await t.update(itemRef, { status: 'sold' });
+
+        return Promise.resolve({ deposit: newDeposit });
+      });
+
+      console.log(tran);
+
+      return tran;
     } catch (e) {
       console.log(e.message);
       return { error: e.message };

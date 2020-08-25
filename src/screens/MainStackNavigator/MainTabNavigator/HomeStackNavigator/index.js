@@ -204,9 +204,11 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const ItemScreen = ({ route, navigation }) => {
+  let context = StateContainer.useContainer();
   const { itemId } = route.params;
   const [item, setItem] = React.useState({});
   const [like, setLike] = React.useState(false);
+  const [reload, setReload] = React.useState(Date.now());
 
   React.useEffect(() => {
     (async () => {
@@ -222,7 +224,7 @@ const ItemScreen = ({ route, navigation }) => {
         }
       }
     })();
-  }, []);
+  }, [reload]);
 
   const toggleLike = async () => {
     await firebase.toggleLike(itemId, !like);
@@ -251,8 +253,19 @@ const ItemScreen = ({ route, navigation }) => {
   const buyItem = () => {
     Alert.alert('購入しますか？', null, [
       { text: 'キャンセル' },
-      { text: 'はい' },
-      // { text: 'はい', onPress: firebase.buyItem(itemId) },
+      // { text: 'はい' },
+      {
+        text: 'はい',
+        onPress: async () => {
+          let res = await firebase.buyItem(item.id);
+          if (res.error) {
+            Alert.alert('エラー', res.error);
+          } else {
+            context.updateUser(res);
+            setReload(Date.now());
+          }
+        },
+      },
     ]);
   };
 

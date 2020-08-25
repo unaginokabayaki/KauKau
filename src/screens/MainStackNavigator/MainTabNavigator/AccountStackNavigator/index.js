@@ -418,7 +418,7 @@ const DepositScreen = ({ route, navigation }) => {
     }
 
     // DB更新
-    const res = await firebase.updateDeposit(context.user.id, numAmount);
+    const res = await firebase.updateDeposit(numAmount);
 
     // Context更新
     context.updateUser({ deposit: res.deposit });
