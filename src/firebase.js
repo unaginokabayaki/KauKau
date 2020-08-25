@@ -101,9 +101,9 @@ class Firebase {
     // ログインユーザのuid。コレクションのキーとして使う。
     this.fbUid = null;
 
-    const db = firebase.firestore();
-    this.user = db.collection('user');
-    this.item = db.collection('item');
+    this.db = firebase.firestore();
+    this.user = this.db.collection('user');
+    this.item = this.db.collection('item');
   }
 
   wait = (ms) => {
@@ -332,17 +332,12 @@ class Firebase {
   // アイテム登録
   registerItem = async (item, images, status) => {
     try {
+      let batch = this.db.batch();
       // id発行
-      const docRef = await this.item.add({
-        created_time: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-      console.log(`new item is created: ${docRef.id}`);
-      // 画像アップロード
-      const imageUploadedPath = await this.saveImages(docRef.id, images);
-      // console.log(imageUploadedPath);
+      const docRef = this.item.doc();
 
-      let data = {
-        image_uri: imageUploadedPath,
+      const addRef = batch.set(docRef, {
+        created_time: firebase.firestore.FieldValue.serverTimestamp(),
         title: item.title,
         description: item.description,
         category: item.category,
@@ -353,12 +348,23 @@ class Firebase {
         status: status,
         seller: this.fbUid,
         buyer: '',
+      });
+      console.log(`new item is created: ${addRef.id}`);
+
+      // 画像アップロード
+      const imageUploadedPath = await this.saveImages(addRef.id, images);
+      // console.log(imageUploadedPath);
+
+      let data = {
+        image_uri: imageUploadedPath,
         updated_time: firebase.firestore.FieldValue.serverTimestamp(),
       };
 
       // 画像パス更新
-      const docUplRef = await this.item.doc(`${docRef.id}`).update(data);
+      const docUplRef = batch.update(this.item.doc(`${docRef.id}`), data);
       console.log('file path is saved');
+
+      batch.commit();
 
       return { id: docRef.id };
     } catch (e) {
