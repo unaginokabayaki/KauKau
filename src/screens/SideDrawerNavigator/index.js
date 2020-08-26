@@ -10,6 +10,8 @@ import {
 import * as WebBrowser from 'expo-web-browser';
 import { StateContainer } from 'app/src/AppContext';
 import { Ionicons } from '@expo/vector-icons';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import MainStackNavigator from 'app/src/screens/MainStackNavigator';
@@ -21,6 +23,34 @@ import styles from './styles';
 const SideDrawer = createDrawerNavigator();
 const SideDrawerNavigator = () => {
   const context = StateContainer.useContainer();
+
+  React.useEffect(() => {
+    (async () => {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      console.log(finalStatus);
+      // パーミッションダイアログ表示
+      if (existingStatus !== 'granted') {
+        const { stuatus } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = stuatus;
+      }
+
+      if (finalStatus !== 'granted') {
+        return;
+      }
+
+      // デバイストークン取得してfirebaseに保存
+      const deviceToken = await Notifications.getExpoPushTokenAsync();
+      if (deviceToken) {
+        firebase.updateDeviceToken(deviceToken);
+      }
+    })();
+  }, []);
+
   return (
     <SideDrawer.Navigator
       drawerType="front"

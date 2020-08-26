@@ -24,6 +24,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
+import { Notifications } from 'expo';
 
 import DrawerButton from 'app/src/common/DrawerButton';
 import LoginOverlay from 'app/src/common/LoginOverlay';
@@ -158,6 +159,22 @@ const AccountScreen = ({ navigation, route }) => {
               <Text>{convertToCurrency(context.user?.deposit ?? 0)}</Text>
             }
             onPress={() => navigation.navigate('Deposit')}
+          />
+        </View>
+        <View style={{ margin: 10, display: 'none' }}>
+          <Button
+            title="Notification"
+            onPress={async () => {
+              let nid = await Notifications.scheduleLocalNotificationAsync(
+                {
+                  title: 'テスト',
+                  body: 'これはてすとです',
+                  data: {},
+                },
+                {
+                  time: new Date().getTime() + 5000, //5病後に表示                }
+              );
+            }}
           />
         </View>
       </View>

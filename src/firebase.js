@@ -556,6 +556,24 @@ class Firebase {
     }
   };
 
+  updateDeviceToken = async (deviceToken) => {
+    try {
+      let data = {
+        deviceToken,
+      };
+
+      const updateRef = await this.user.doc(`${this.fbUid}`);
+      await updateRef.update(data);
+
+      const snap = await updateRef.get();
+
+      return { id: snap.id, ...snap.data() };
+    } catch (e) {
+      console.log(e.message);
+      return { error: e.message };
+    }
+  };
+
   buyItem = async (itemId) => {
     try {
       let userRef = await this.user.doc(`${this.fbUid}`);
