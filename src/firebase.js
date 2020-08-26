@@ -499,7 +499,7 @@ class Firebase {
         throw Error('No such document');
       }
 
-      let data = { id, ...doc.data() };
+      let data = { id, name: '', profile: '', deposit: 0, ...doc.data() };
 
       return { user: data };
     } catch (e) {

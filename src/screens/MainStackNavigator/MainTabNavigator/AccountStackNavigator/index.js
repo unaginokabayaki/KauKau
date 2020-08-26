@@ -67,7 +67,7 @@ const AccountScreen = ({ navigation, route }) => {
   React.useEffect(() => {
     console.log(context.user);
     (async () => {
-      let { user } = await firebase.getUser(context.user.id);
+      let { user } = await firebase.getUser(context.authInfo.uid);
       if (user) {
         console.log(user);
         setUser(user);
@@ -75,17 +75,17 @@ const AccountScreen = ({ navigation, route }) => {
     })();
   }, [showLogin]);
 
+  if (context.authInfo.isAnonymous) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', margin: 10 }}>
+        <LoginOverlay showLogin={showLogin} setShowLogin={setShowLogin} />
+        <Button title="Login to continue" onPress={() => setShowLogin(true)} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
-      {context.user.isAnonymous && (
-        <View style={styles.container}>
-          <LoginOverlay showLogin={showLogin} setShowLogin={setShowLogin} />
-          <Button
-            title="Login to continue"
-            onPress={() => setShowLogin(true)}
-          />
-        </View>
-      )}
       <View>
         <Text>ユーザー</Text>
         <View
@@ -155,7 +155,7 @@ const AccountScreen = ({ navigation, route }) => {
             bottomDivider
             chevron
             rightElement={
-              <Text>{convertToCurrency(context.user.deposit ?? 0)}</Text>
+              <Text>{convertToCurrency(context.user?.deposit ?? 0)}</Text>
             }
             onPress={() => navigation.navigate('Deposit')}
           />

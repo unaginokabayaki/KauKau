@@ -562,9 +562,9 @@ const ChatScreen = ({ route, navigation }) => {
         messages={messages}
         onSend={onSend}
         user={{
-          _id: context.user.id,
-          name: 'ME',
-          avatar: 'https://randomuser.me/api/portraits/lego/5.jpg',
+          _id: context.authInfo.uid,
+          name: context.user.name,
+          avatar: context.user.image_uri,
         }}
         alignTop={true}
         showUserAvatar={true}
